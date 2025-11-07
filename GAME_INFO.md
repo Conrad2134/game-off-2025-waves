@@ -29,6 +29,11 @@ You're trapped in Valentin's library/study with several other guests. The doors 
 6. **Accuse** the culprit (Valentin won't unlock the door until you're right!)
 
 ### Tone & Style
+- **Visual Style**: Cozy/warm pixel art (inspired by Stardew Valley/Celeste aesthetic)
+- **Comedy**: Absurdist humor through Valentin's dramatic overreaction
+- **Mystery**: Moderate difficulty with genuine deduction required (scalable for future versions)
+- **Cultural Flavor**: Light German language integration (mainly exclamations and phrases from Valentin)
+
 ## Game World
 
 ### Setting
@@ -54,6 +59,8 @@ You're trapped in Valentin's library/study with several other guests. The doors 
 
 ### Player Character
 - **Role**: One of the trapped guests at Valentin's gathering
+- **Appearance**: Defined protagonist sprite with distinct visual design
+- **Movement**: Top-down character control, walks around the library to interact with objects and people
 - **Motivation**: Get out of this increasingly awkward situation by solving the mystery
 - **Personality**: Player-defined through dialogue choices (sympathetic, sarcastic, earnest, etc.)
 - **Abilities**: Can talk to anyone, examine objects, observe details, make deductions
@@ -61,10 +68,11 @@ You're trapped in Valentin's library/study with several other guests. The doors 
 
 ### Valentin (The Host/Victim)
 - **Role**: Castle owner, host, and victim of the erdbeerstrudel theft
+- **Investigation Role**: Guards the locked door, pacing dramatically. Occasionally shouts in German or makes comments, but lets you investigate. You can talk to him when needed.
 - **Personality**: 
   - Passionate to the point of obsession about his baking
   - Theatrical and dramatic (treats this like a serious crime)
-  - Speaks with German phrases peppered throughout
+  - Speaks with German phrases peppered throughout (main source of German language in game)
   - Oscillates between rage, despair, and manic energy
   - Surprisingly competent at keeping everyone locked in
 - **Appearance**: Well-dressed, probably has an apron or baking-related accessory
@@ -75,7 +83,9 @@ You're trapped in Valentin's library/study with several other guests. The doors 
 - **Relationship**: He invited everyone here, but now trusts no one
 
 ### Guest Characters (Pool System)
-**The Locked Room Group** - 5-7 other people trapped with you:
+**The Locked Room Group** - **5 guest characters** (+ Valentin + Player = 7 total):
+
+**V1.0 Character Count**: 5 unique guest characters, each with distinct personalities, motivations, and roles in the mystery. Manageable scope while providing enough suspects for a satisfying mystery.
 
 **Potential Character Archetypes:**
 - **The Nervous Guest**: Keeps insisting they didn't do it (suspiciously)
@@ -99,11 +109,14 @@ You're trapped in Valentin's library/study with several other guests. The doors 
   - Helpful witnesses (genuinely want to solve this)
   - Evasive suspects (clearly hiding something)
   - Dismissive types (think this is ridiculous)
+- **Language**: Primarily English with light German sprinkling for flavor and cultural authenticity
 #### Clue Discovery
+- **Interaction System**: Automatic indicators (!) appear above interactable objects and people when nearby
+- **The Crime Scene**: Plate with strudel remnants (partially eaten) provides physical forensic evidence
 - **Physical Clues**: Found by examining objects in the library/study
   - Crumbs on someone's clothing or chair
-  - Powdered sugar traces
-  - Plate/fork hidden somewhere
+  - Powdered sugar traces on the plate and potentially on culprit
+  - Partially eaten strudel with specific evidence
   - Napkins with strudel remnants
   - Moved furniture or items
   - Stain on clothing
@@ -123,15 +136,19 @@ You're trapped in Valentin's library/study with several other guests. The doors 
 - **Clue Combination**: Some clues only make sense when combined
   - Example: "crumbs on chair" + "person sitting there" + "timeline" = opportunity
   - "motivation for revenge" + "kitchen access" + "missing napkin" = method
-### Additional Characters (Pool System)
-The game will feature a pool of diverse characters, including:
-- Castle staff (butler, chef, maids)
 #### Accusation Mechanics
+- **Phoenix Wright Style**: Interactive accusation system where you present evidence to counter statements
+- **How It Works**:
 - **When Ready**: Player can accuse any character at any time (approach Valentin with your theory)
-- **Valentin's Judgment**: Present your case to Valentin, who demands an explanation
+- **Confrontation System**: 
+  1. Choose a suspect to accuse
+  2. Valentin (or the accused) makes statements during confrontation
+  3. Present specific evidence from your notebook to support or contradict claims
+  4. Interactive back-and-forth like Phoenix Wright courtroom sequences
+  5. Must successfully present the right evidence to prove guilt
 - **Consequence System**:
   - **Correct Accusation**: 
-    - Dramatic confrontation scene
+    - Dramatic confrontation scene concludes
     - Culprit confesses (or defends themselves amusingly)
     - Valentin's reaction (rage? Forgiveness? More German dramatics?)
     - Door unlocks, everyone free to leave
@@ -141,11 +158,8 @@ The game will feature a pool of diverse characters, including:
     - Accused character reacts (hurt, angry, smug)
     - Room tension increases
     - Player can continue investigating
-    - Maybe limit of 3 wrong accusations before "bad ending"?
-  - **Multiple Attempts**: Allowed, but social consequences
-    - Characters trust you less
-    - Valentin becomes more unhinged
-    - Adds comedy but also raises stakes
+    - **2 wrong accusations = BAD ENDING**: Valentin gives up in despair, unlocks door, mystery remains unsolved
+  - **Stakes**: Limited to 2 mistakes before failure ending - creates tension while allowing learning
 
 ### Near-Term Replayability (Configuration-Based)
 **Version 2.0 Scope**: Multiple pre-designed scenarios using:
@@ -201,9 +215,15 @@ The game will feature a pool of diverse characters, including:
     }
   ]
 }
-```*Clue Log**: All discovered clues stored and reviewable
-- **Character Profiles**: Track what you've learned about each person
-- **Notes Section**: Player can add their own observations
+```**Das Notizbuch** (The Notebook) UI:
+- **Organization**: Character-centric layout with tabs/pages for each suspect
+- **Character Profiles**: Each suspect has their own page with:
+  - Portrait and basic info
+  - All clues related to them
+  - Testimonies and contradictions
+  - Observed behaviors
+- **Evidence Presentation**: Used during Phoenix Wright-style accusation to present specific clues
+- **Auto-Save**: Progress automatically saved as clues are discovered
 - **Connection Web**: [Future feature] Visual representation of clue relationships
 
 ### Deduction & Accusation
@@ -212,33 +232,33 @@ The game will feature a pool of diverse characters, including:
 - Player must identify:
   1. **Motive**: Why they wanted the erdbeerstrudel
 ### Main Screens
-1. **Title Screen**: Start new game, continue (if save exists), options
+1. **Title Screen**: Start new game, continue (auto-saved progress), options
 2. **Investigation View**: Top-down locked library/study with player movement
-   - Can walk around the room
-   - Interact with objects and people
+   - Walk around the room with WASD/Arrow keys
+   - Automatic (!) indicators show interactable objects/people
+   - Press E to examine/interact when near indicators
    - Valentin pacing/standing by the locked door
+   - Cozy, warm pixel art aesthetic
 3. **Dialogue View**: Character portrait + text box with dialogue options
-   - German phrases with contextual translations
+   - German phrases with contextual translations (light sprinkling)
    - Character expressions/reactions
+   - Dialogue-driven investigation gameplay
 4. **Notebook View**: Evidence, character notes, case summary
    - **"Das Notizbuch"** (The Notebook)
-   - Clues organized visually
-   - Character suspect profiles
-5. **Accusation View**: Present your theory to Valentin
-   - Dramatic confrontation setup
-   - Valentin awaits your verdict
+   - Character-centric organization with tabs for each suspect
+   - All clues related to each character grouped together
+   - Used to review evidence and select clues during accusation
+5. **Accusation View**: Phoenix Wright-style confrontation
+   - Dramatic scene with accused character and Valentin
+   - Statements made that you must support/contradict
+   - Select evidence from notebook to present
+   - Interactive back-and-forth dialogue
 6. **Resolution Screen**: Mystery solved (or failed)
    - Culprit revealed and reacts
    - Valentin's dramatic response
    - Door unlocks (or doesn't)
-   - Ending variations based on outcome
-  - **Incorrect Accusation**: Feedback on what was wrong, continue investigating
-  - **Multiple Attempts**: Allowed, but perhaps with consequences? (embarrassment, time loss?)
+   - Victory ending or bad ending (if 2 wrong accusations made)
 
-**Questions for refinement:**
-- Should there be a limit on wrong accusations?
-- Should the player need to present specific evidence, or just choose the culprit?
-- Should there be a "confidence" system where you need sufficient evidence before accusing?
 ### Scene Structure
 ```
 StartScene          → Title screen, menu
@@ -253,13 +273,19 @@ ConclusionScene     → Mystery resolution, door unlocks (or doesn't), ending
 ### Introduction Sequence (IntroScene)
 **The Setup**:
 1. Brief scene showing everyone gathering for dessert
-2. Valentin enters with empty plate, face goes red
+2. Valentin enters, discovers the plate with partially eaten strudel
 3. "MEIN ERDBEERSTRUDEL! Someone has eaten MEIN ERDBEERSTRUDEL!"
 4. Valentin's dramatic meltdown in German and English
 5. *Click* - Door locks
 6. "Nobody leaves this room until I know who did this! NIEMAND!"
-7. Camera pans to show all trapped guests
-8. Player control beginsesigned, polished experience
+7. Camera pans to show all trapped guests (5 guests + player)
+8. Player control begins - top-down movement investigation starts
+
+### Audio Design
+- **Background Music**: Atmospheric music in the library (tense strings, quiet piano, German-inspired melodies)
+- **Sound Effects**: Footsteps, door sounds, examining objects, dialogue blips, Valentin's pacing
+- **Ambient Sounds**: Crackling fireplace, clock ticking, distant castle ambiance
+- **Dynamic Audio**: Music intensity changes based on investigation progress and dramatic moments
 
 ### Near-Term Replayability (Configuration-Based)
 **Version 2.0 Scope**: Multiple pre-designed scenarios using:
@@ -345,129 +371,100 @@ ConclusionScene     → Mystery resolution, door unlocks (or doesn't), ending
 
 ### Phase 2: Full Mystery Implementation
 - [ ] Complete locked library/study environment
-  - [ ] Detailed pixel art room with German castle aesthetic
-  - [ ] Interactive objects (desk, bookshelves, fireplace, etc.)
-  - [ ] Visual indicators for interactable items
-- [ ] 5-7 guest characters + Valentin
-  - [ ] Unique sprites with German-inspired designs
-  - [ ] Distinct personalities and germanisms
-  - [ ] Character positioning in room
+  - [ ] Detailed pixel art room with cozy/warm aesthetic (Stardew Valley-inspired)
+  - [ ] German castle décor (bookshelves, desk, fireplace, etc.)
+  - [ ] Automatic (!) indicators for interactable items
+  - [ ] Plate with partially eaten strudel as crime scene centerpiece
+- [ ] 5 guest characters + Valentin
+  - [ ] Unique sprites with cozy pixel art style
+  - [ ] Distinct personalities (one will be culprit)
+  - [ ] Valentin positioned by locked door, pacing animation
+  - [ ] Defined protagonist sprite design
 - [ ] Full dialogue trees for all characters
   - [ ] Initial conversations
-  - [ ] Clue-dependent dialogue
-  - [ ] Character relationship dialogues
+  - [ ] Clue-dependent dialogue unlocks
+  - [ ] Light German sprinkling (mainly from Valentin)
   - [ ] Valentin's dramatic interjections
 - [ ] 10-15 clues scattered throughout
-  - [ ] Physical evidence in room
+  - [ ] Physical evidence from strudel remnants
   - [ ] Testimony contradictions
   - [ ] Behavioral observations
 - [ ] Notebook UI ("Das Notizbuch")
-  - [ ] Clue collection and review
-  - [ ] Character suspect profiles
-  - [ ] Investigation notes
-- [ ] Accusation mechanic
-  - [ ] Present case to Valentin
+  - [ ] Character-centric organization with tabs
+  - [ ] Clue collection grouped by suspect
+  - [ ] Evidence selection for accusations
+- [ ] Phoenix Wright-style accusation mechanic
+  - [ ] Interactive confrontation system
+  - [ ] Present evidence to counter/support statements
+  - [ ] 2 wrong accusations = bad ending
 ## Open Questions & Discussion Points
 
-### Narrative & Setting ✓ (Mostly Resolved)
-1. ✅ **Player's role**: Trapped guest who becomes the de facto investigator
-2. ✅ **Valentin's role**: Castle owner/host who locks everyone in
-3. ✅ **Introduction**: Yes - dramatic locking scene showing Valentin's meltdown
-4. ✅ **Resolution tone**: Absurdist/comedic but satisfying reveal
+### Narrative & Setting ✅ (Resolved)
+1. ✅ **Player's role**: Defined protagonist, trapped guest who investigates
+2. ✅ **Player movement**: Top-down exploration with WASD/arrows
+3. ✅ **Valentin's role**: Castle owner/host who locks everyone in, guards door dramatically
+4. ✅ **Introduction**: Dramatic locking scene showing Valentin's meltdown over partially eaten strudel
+5. ✅ **Resolution tone**: Absurdist/comedic but satisfying reveal
 
-### Gameplay Mechanics (Still Open)
-5. **Time limit?** 
-   - Option A: No time limit, just wrong accusation limit (3 strikes)
-   - Option B: Party "stages" where Valentin gets progressively more unhinged
-   - Recommendation: Start with no time limit for Version 1.0
-6. **Failure state?**
-   - Should there be a "bad ending" after 3 wrong accusations?
-   - Or can player investigate indefinitely?
-   - Recommendation: Allow retry but with consequences (Valentin more upset, characters less trusting)
-7. **Dialogue skill checks?** 
-   - For Version 1.0: No, keep it simple
-   - Future: Could add persuasion/charm mechanics
-8. **Evidence analysis?**
-   - Automatic understanding with flavor text
-   - No complex mini-games for Version 1.0
-9. ✅ **Red herrings**: Yes! Essential for mystery
-10. **Player notes?**
-    - Auto-collected clues: Yes
-    - Manual annotations: Future feature
+### Gameplay Mechanics ✅ (Resolved)
+6. ✅ **Time limit**: No time limit for V1.0, focus on investigation quality
+7. ✅ **Failure state**: 2 wrong accusations = bad ending (Valentin gives up, mystery unsolved)
+8. ✅ **Interaction system**: Automatic (!) indicators show interactable objects/people
+9. ✅ **Accusation style**: Phoenix Wright-style with evidence presentation
+10. ✅ **Dialogue skill checks**: No for V1.0, keep it simple
+11. ✅ **Evidence analysis**: Automatic understanding with flavor text, no mini-games
+12. ✅ **Red herrings**: Yes! Essential for mystery
+13. ✅ **Clue organization**: Character-centric notebook with tabs for each suspect
+14. ✅ **Save system**: Auto-save to localStorage, resume anytime
 
-### Character & Story
-11. **Character count for V1?**
-    - Recommendation: **5-6 guests + Valentin + player = 7-8 total**
-    - Manageable scope, enough suspects, intimate locked-room feel
-12. **Character relationships?**
-    - Yes! Makes dialogue more interesting
-    - Examples: Old friends, rivals, strangers, family
-13. **Motive variety?**
+### Character & Story ✅ (Resolved)
+15. ✅ **Character count for V1**: **5 guests + Valentin + player = 7 total**
+16. ✅ **Character relationships**: Yes! Old friends, rivals, strangers make dialogue interesting
+17. ✅ **Motive variety**: Multiple possible motives across character pool
 ### Version 1.0 (Single Mystery - "Das Erdbeerstrudel Incident")
 - [ ] One complete locked-room mystery that takes 30-45 minutes to solve
-- [ ] 5-6 unique guest characters + Valentin, all memorable with German flair
-- [ ] Dramatic introduction (Valentin's meltdown, door locks)
-- [ ] Detailed library/study environment with German castle aesthetic
-- [ ] Satisfying "aha!" moment when solution is discovered
+- [ ] **5 unique guest characters + Valentin + defined protagonist** (7 total)
+- [ ] Dramatic introduction (Valentin's meltdown, discovers partially eaten strudel, locks door)
+- [ ] Detailed library/study environment with cozy pixel art (Stardew Valley-inspired)
+- [ ] **Moderate difficulty** with 2-3 viable suspects until key clues found (scalable in future)
 - [ ] All core systems functional and polished:
-  - Movement and interaction
+  - Top-down movement with automatic interaction indicators
   - Dialogue system with branching paths
-  - Clue collection and notebook
-  - Accusation mechanic with consequences
-  - Victory/failure conditions
-- [ ] German cultural elements integrated naturally (language, humor, references)
-- [ ] Pixel art aesthetic is consistent and charming
+  - Character-centric notebook ("Das Notizbuch")
+  - Phoenix Wright-style accusation with evidence presentation
+  - 2 wrong accusations = bad ending, correct = victory
+  - Auto-save system
+  - Background music + SFX
+- [ ] Light German cultural integration (mainly Valentin's exclamations)
+- [ ] Cozy, warm pixel art aesthetic is consistent and charming
 - [ ] Playable on modern web browsers (Chrome, Firefox, Safari)
-- [ ] One culprit, 10-15 clues, multiple red herringsmotive (betrayal vs. sympathy)
+- [ ] One culprit, 10-15 clues including physical evidence from strudel remnants, multiple red herringsmotive (betrayal vs. sympathy)
     - Social embarrassment
     - Possible reconciliation or banishment from future events
     - **Comedic resolution**: Maybe culprit has to bake replacement?
 
-### Replayability Design
-15. **Modular from start?**
-    - Recommendation: **Build modular data structure but focus on ONE polished mystery**
-    - Use JSON for characters/dialogue/clues from day one
-    - Makes future expansion easier
-    - Version 1.0 = one mystery, but architected for expansion
-16. **Quality vs. Variety?**
-    - Version 1.0: Depth and polish (one great mystery)
-    - Version 2.0: Breadth (5-10 variations)
-    - Version 3.0: AI-generated infinite variety
-17. **Character consistency?**
-    - Characters stay consistent across mysteries
-    - Roles change (culprit, witness, red herring)
-    - Different dialogue sets for different roles
-18. ✅ **Room layout**: Same locked library, different details/clues each playthrough
+### Replayability Design ✅ (Resolved)
+18. ✅ **Modular from start**: Build modular JSON data structure but focus on ONE polished mystery for V1.0
+19. ✅ **Quality vs. Variety**: V1.0 = depth and polish, V2.0+ = breadth with variations
+20. ✅ **Character consistency**: Architecture supports future character pool system
+21. ✅ **Room layout**: Same locked library for V1.0, architected for future variations
 
-### Technical & Scope
-19. **Target playtime?**
-    - Recommendation: **30-45 minutes** for first playthrough
-    - 15-20 minutes for subsequent (know the system)
-20. **Difficulty levels?**
-    - Version 1.0: Single difficulty, well-balanced
-    - Future: Easy (obvious clues), Hard (subtle clues)
-21. **Platform support?**
-    - Version 1.0: Desktop browser (keyboard + mouse)
-    - Future: Mobile touch controls
-22. **Achievements?**
-    - Future feature
-    - Ideas: "Speed solver", "Got it first try", "Talked to everyone", etc.
+### Technical & Scope ✅ (Resolved)
+22. ✅ **Target playtime**: **30-45 minutes** for first playthrough
+23. ✅ **Difficulty**: **Moderate** for V1.0, architected to be scalable (easy/hard modes in future)
+24. ✅ **Platform support**: Desktop browser (keyboard + mouse) for V1.0
+25. ✅ **Achievements**: Future feature
+26. ✅ **Audio**: Background music + sound effects + ambient sounds
 
-### German Cultural Elements (New)
-23. **Language balance?**
-    - German phrases with context clues for understanding
-    - Don't alienate non-German speakers
-    - Examples: "Mein Gott!" = obviously "My God!", "Das ist unglaublich!" = "unbelievable" (said when something shocking)
-24. **Cultural references?**
-    - German punctuality jokes
-    - Engineering precision
-    - Food culture (serious business!)
-    - Castle/schloss terminology
-    - Keep it lighthearted and respectful
-25. **Valentin's germanisms?**
-    - Switches between English and German when emotional
-    - Uses German for exclamations and emphasis
-    - Keeps dialogue accessible while adding flavor
+### Visual & Cultural Design ✅ (Resolved)
+27. ✅ **Art style**: Cozy/warm pixel art (Stardew Valley/Celeste inspired)
+28. ✅ **Language balance**: Light German sprinkling, mainly through Valentin's exclamations
+29. ✅ **Cultural elements**: 
+    - Valentin switches to German when emotional (exclamations, emphasis)
+    - German food culture taken seriously
+    - Castle/schloss atmosphere
+    - Lighthearted and respectful treatment
+30. ✅ **The strudel**: Partially eaten with physical remnants as key evidence
 - **ESC**: Menu/pause
 - **Mouse**: Click to interact (alternative to keyboard)
 - **Number Keys**: Quick-select dialogue options
@@ -503,10 +500,10 @@ ConclusionScene     → Mystery resolution, ending
 - Validates accusation against mystery solution
 
 #### GameStateManager
-- Persists investigation progress to localStorage
-- Tracks time/events during party
+- **Auto-save**: Continuously persists investigation progress to localStorage
+- Tracks discovered clues, completed dialogues, current position
 - Manages mystery scenario (current version/culprit)
-- Handles save/load functionality
+- Allows seamless resume from any point
 
 #### ClueNotebook Component
 - Displays discovered clues with descriptions
@@ -643,12 +640,19 @@ ConclusionScene     → Mystery resolution, ending
 ## Success Criteria
 
 ### Version 1.0 (Single Mystery)
-- [ ] One complete mystery that takes 45-60 minutes to solve
-- [ ] 6-8 unique, memorable characters
-- [ ] Satisfying "aha!" moment when solution is discovered
-- [ ] All core systems functional and polished
-- [ ] Pixel art aesthetic is consistent and charming
+- [ ] One complete mystery that takes 30-45 minutes to solve
+- [ ] 5 unique guest characters + Valentin + defined protagonist (7 total)
+- [ ] Moderate difficulty with satisfying "aha!" moment
+- [ ] All core systems functional and polished:
+  - [ ] Top-down movement with automatic indicators
+  - [ ] Character-centric notebook organization
+  - [ ] Phoenix Wright-style accusation system
+  - [ ] Auto-save functionality
+  - [ ] Background music + SFX
+- [ ] Cozy, warm pixel art aesthetic (Stardew Valley-inspired)
+- [ ] Light German cultural integration (accessible to all players)
 - [ ] Playable on modern web browsers
+- [ ] 2 wrong accusations = bad ending system working
 
 ### Version 2.0 (Replayability)
 - [ ] 5 different mysteries with unique solutions
@@ -683,9 +687,9 @@ ConclusionScene     → Mystery resolution, ending
 
 ## Document Status
 
-**Version**: 0.1 (Draft)  
-**Last Updated**: 2025-11-06  
-**Status**: Open for discussion and refinement
+**Version**: 0.2 (Design Locked)  
+**Last Updated**: 2025-11-07  
+**Status**: Core design decisions finalized, ready for implementation
 
 This document is a living guide for the game's design. All sections marked with questions are open for discussion and decision-making. As decisions are made, this document should be updated to reflect the game's evolving vision.
 
