@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { StartScene } from './scenes/start-scene';
+import { LibraryScene } from './scenes/library-scene';
 
 const GAME_WIDTH = 1024;
 const GAME_HEIGHT = 768;
@@ -19,7 +20,7 @@ const config: Phaser.Types.Core.GameConfig = {
     target: TARGET_FPS,
     forceSetTimeOut: false,
   },
-  scene: [StartScene],
+  scene: [StartScene, LibraryScene],
   physics: {
     default: 'arcade',
     arcade: {

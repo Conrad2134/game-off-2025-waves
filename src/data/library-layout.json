@@ -1,0 +1,124 @@
+{
+  "sceneId": "library-v1",
+  "version": "1.0.0",
+  "worldSize": {
+    "width": 1200,
+    "height": 800
+  },
+  "playerSpawn": {
+    "x": 600,
+    "y": 400
+  },
+  "furniture": [
+    {
+      "id": "desk-valentin",
+      "type": "desk",
+      "sprite": "desk",
+      "position": { "x": 200, "y": 150 },
+      "collisionBox": { "width": 120, "height": 80 },
+      "layer": 0
+    },
+    {
+      "id": "bookshelf-north-1",
+      "type": "bookshelf",
+      "sprite": "bookshelf-tall",
+      "position": { "x": 100, "y": 100 },
+      "collisionBox": { "width": 60, "height": 180 },
+      "layer": 0
+    },
+    {
+      "id": "bookshelf-north-2",
+      "type": "bookshelf",
+      "sprite": "bookshelf-tall",
+      "position": { "x": 1100, "y": 100 },
+      "collisionBox": { "width": 60, "height": 180 },
+      "layer": 0
+    },
+    {
+      "id": "fireplace-center",
+      "type": "fireplace",
+      "sprite": "fireplace",
+      "position": { "x": 600, "y": 150 },
+      "collisionBox": { "width": 100, "height": 60 },
+      "layer": 0
+    },
+    {
+      "id": "couch-south",
+      "type": "seating",
+      "sprite": "couch",
+      "position": { "x": 600, "y": 650 },
+      "collisionBox": { "width": 120, "height": 50 },
+      "layer": 0
+    },
+    {
+      "id": "chair-west-1",
+      "type": "seating",
+      "sprite": "chair",
+      "position": { "x": 250, "y": 400 },
+      "collisionBox": { "width": 32, "height": 32 },
+      "layer": 0
+    },
+    {
+      "id": "chair-east-1",
+      "type": "seating",
+      "sprite": "chair",
+      "position": { "x": 950, "y": 400 },
+      "collisionBox": { "width": 32, "height": 32 },
+      "layer": 0
+    },
+    {
+      "id": "dining-table-east",
+      "type": "table",
+      "sprite": "dining-table",
+      "position": { "x": 1000, "y": 400 },
+      "collisionBox": { "width": 160, "height": 80 },
+      "layer": 0
+    },
+    {
+      "id": "window-north-1",
+      "type": "window",
+      "sprite": "window",
+      "position": { "x": 400, "y": 70 },
+      "collisionBox": { "width": 80, "height": 40 },
+      "layer": 0
+    },
+    {
+      "id": "window-north-2",
+      "type": "window",
+      "sprite": "window",
+      "position": { "x": 800, "y": 70 },
+      "collisionBox": { "width": 80, "height": 40 },
+      "layer": 0
+    },
+    {
+      "id": "trophy-wall-west",
+      "type": "decoration",
+      "sprite": "trophy-wall",
+      "position": { "x": 75, "y": 300 },
+      "collisionBox": { "width": 0, "height": 0 },
+      "layer": 1
+    },
+    {
+      "id": "bar-cart-southeast",
+      "type": "decoration",
+      "sprite": "bar-cart",
+      "position": { "x": 900, "y": 700 },
+      "collisionBox": { "width": 40, "height": 60 },
+      "layer": 0
+    },
+    {
+      "id": "locked-door-south",
+      "type": "door",
+      "sprite": "locked-door",
+      "position": { "x": 600, "y": 750 },
+      "collisionBox": { "width": 80, "height": 40 },
+      "layer": 0
+    }
+  ],
+  "walls": [
+    { "x": 0, "y": 0, "width": 1200, "height": 50 },
+    { "x": 0, "y": 750, "width": 1200, "height": 50 },
+    { "x": 0, "y": 0, "width": 50, "height": 800 },
+    { "x": 1150, "y": 0, "width": 50, "height": 800 }
+  ]
+}

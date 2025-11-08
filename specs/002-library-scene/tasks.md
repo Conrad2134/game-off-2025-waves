@@ -23,9 +23,9 @@ Single project structure:
 
 **Purpose**: Project initialization and type definitions
 
-- [ ] T001 Create TypeScript type definitions in src/types/scenes.ts (copy from contracts/scene-api.ts)
-- [ ] T002 [P] Create scene layout configuration file in src/data/library-layout.json
-- [ ] T003 [P] Update asset manifest in src/data/assets.json with all furniture sprites
+- [X] T001 Create TypeScript type definitions in src/types/scenes.ts (copy from contracts/scene-api.ts)
+- [X] T002 [P] Create scene layout configuration file in src/data/library-layout.json
+- [X] T003 [P] Update asset manifest in src/data/assets.json with all furniture sprites
 
 ---
 
@@ -35,13 +35,13 @@ Single project structure:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create PlayerCharacter entity class in src/entities/player-character.ts
-- [ ] T005 Implement WASD and arrow key input handling in PlayerCharacter
-- [ ] T006 Add diagonal movement normalization in PlayerCharacter.update()
-- [ ] T007 Implement movement locking capability in PlayerCharacter (lockMovement/unlockMovement methods)
-- [ ] T008 Configure PlayerCharacter physics body (28x28 collision box, centered offset)
-- [ ] T009 Create LibraryScene class skeleton in src/scenes/library-scene.ts
-- [ ] T010 Register LibraryScene in src/main.ts scene configuration array
+- [X] T004 Create PlayerCharacter entity class in src/entities/player-character.ts
+- [X] T005 Implement WASD and arrow key input handling in PlayerCharacter
+- [X] T006 Add diagonal movement normalization in PlayerCharacter.update()
+- [X] T007 Implement movement locking capability in PlayerCharacter (lockMovement/unlockMovement methods)
+- [X] T008 Configure PlayerCharacter physics body (28x28 collision box, centered offset)
+- [X] T009 Create LibraryScene class skeleton in src/scenes/library-scene.ts
+- [X] T010 Register LibraryScene in src/main.ts scene configuration array
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -55,19 +55,19 @@ Single project structure:
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Implement asset preloading in LibraryScene.preload() with error handling
-- [ ] T012 [P] [US1] Add loaderror event handler with fallback texture generation in LibraryScene
-- [ ] T013 [US1] Load library-layout.json configuration in LibraryScene.preload()
-- [ ] T014 [US1] Load all furniture and player sprites from asset manifest in LibraryScene.preload()
-- [ ] T015 [US1] Implement createFallbackTexture() method for missing assets (magenta rectangles with white borders)
-- [ ] T016 [US1] Implement spawnFurniture() method to create furniture sprites from configuration
-- [ ] T017 [US1] Configure furniture physics bodies as immovable static objects in spawnFurniture()
-- [ ] T018 [US1] Set collision box dimensions and offsets for each furniture piece in spawnFurniture()
-- [ ] T019 [US1] Set furniture render layers (depth) based on configuration in spawnFurniture()
-- [ ] T020 [US1] Initialize furnitureGroup as Phaser.Physics.Arcade.StaticGroup in LibraryScene.create()
-- [ ] T021 [US1] Spawn all furniture objects into furnitureGroup from layout configuration
-- [ ] T022 [US1] Implement validateLayout() method to check world size, furniture count, and spawn position
-- [ ] T023 [US1] Add scene-loaded and scene-ready event emissions in LibraryScene.create()
+- [X] T011 [P] [US1] Implement asset preloading in LibraryScene.preload() with error handling
+- [X] T012 [P] [US1] Add loaderror event handler with fallback texture generation in LibraryScene
+- [X] T013 [US1] Load library-layout.json configuration in LibraryScene.preload()
+- [X] T014 [US1] Load all furniture and player sprites from asset manifest in LibraryScene.preload()
+- [X] T015 [US1] Implement createFallbackTexture() method for missing assets (magenta rectangles with white borders)
+- [X] T016 [US1] Implement spawnFurniture() method to create furniture sprites from configuration
+- [X] T017 [US1] Configure furniture physics bodies as immovable static objects in spawnFurniture()
+- [X] T018 [US1] Set collision box dimensions and offsets for each furniture piece in spawnFurniture()
+- [X] T019 [US1] Set furniture render layers (depth) based on configuration in spawnFurniture()
+- [X] T020 [US1] Initialize furnitureGroup as Phaser.Physics.Arcade.StaticGroup in LibraryScene.create()
+- [X] T021 [US1] Spawn all furniture objects into furnitureGroup from layout configuration
+- [X] T022 [US1] Implement validateLayout() method to check world size, furniture count, and spawn position
+- [X] T023 [US1] Add scene-loaded and scene-ready event emissions in LibraryScene.create()
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - complete library scene displays all furniture
 
@@ -81,17 +81,17 @@ Single project structure:
 
 ### Implementation for User Story 2
 
-- [ ] T024 [US2] Spawn PlayerCharacter at configured spawn position in LibraryScene.create()
-- [ ] T025 [US2] Handle optional custom spawn position from scene data in LibraryScene.create()
-- [ ] T026 [US2] Call player.update(delta) in LibraryScene.update() loop
-- [ ] T027 [US2] Create player-spawned event with position data
-- [ ] T028 [US2] Implement createWalls() method to generate invisible wall collision segments
-- [ ] T029 [US2] Configure wall physics bodies as immovable static rectangles
-- [ ] T030 [US2] Initialize wallsGroup as Phaser.Physics.Arcade.StaticGroup
-- [ ] T031 [US2] Create all wall segments from layout configuration
-- [ ] T032 [US2] Add physics collider between player and furnitureGroup
-- [ ] T033 [US2] Add physics collider between player and wallsGroup
-- [ ] T034 [US2] Test and tune player movement speed (target: 150 px/s for 10-15 second traversal)
+- [X] T024 [US2] Spawn PlayerCharacter at configured spawn position in LibraryScene.create()
+- [X] T025 [US2] Handle optional custom spawn position from scene data in LibraryScene.create()
+- [X] T026 [US2] Call player.update(delta) in LibraryScene.update() loop
+- [X] T027 [US2] Create player-spawned event with position data
+- [X] T028 [US2] Implement createWalls() method to generate invisible wall collision segments
+- [X] T029 [US2] Configure wall physics bodies as immovable static rectangles
+- [X] T030 [US2] Initialize wallsGroup as Phaser.Physics.Arcade.StaticGroup
+- [X] T031 [US2] Create all wall segments from layout configuration
+- [X] T032 [US2] Add physics collider between player and furnitureGroup
+- [X] T033 [US2] Add physics collider between player and wallsGroup
+- [X] T034 [US2] Test and tune player movement speed (target: 150 px/s for 10-15 second traversal)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - scene displays with working player movement and collision
 
@@ -105,14 +105,14 @@ Single project structure:
 
 ### Implementation for User Story 3
 
-- [ ] T035 [US3] Set camera bounds to world size (2400x1600) in LibraryScene.create()
-- [ ] T036 [US3] Configure camera to follow player with smooth lerp (0.1, 0.1) in LibraryScene.create()
-- [ ] T037 [US3] Set camera zoom level to 1.0 (no zoom) in LibraryScene.create()
-- [ ] T038 [US3] Enable camera pixel rounding for pixel-perfect rendering
-- [ ] T039 [US3] Verify camera stops at scene boundaries and doesn't show empty space
-- [ ] T040 [US3] Arrange furniture in library-layout.json to create distinct functional areas (reading, workspace, social)
-- [ ] T041 [US3] Add natural pathways between furniture clusters in layout configuration
-- [ ] T042 [US3] Position locked door prominently in south wall for clear exit visibility
+- [X] T035 [US3] Set camera bounds to world size (2400x1600) in LibraryScene.create()
+- [X] T036 [US3] Configure camera to follow player with smooth lerp (0.1, 0.1) in LibraryScene.create()
+- [X] T037 [US3] Set camera zoom level to 1.0 (no zoom) in LibraryScene.create()
+- [X] T038 [US3] Enable camera pixel rounding for pixel-perfect rendering
+- [X] T039 [US3] Verify camera stops at scene boundaries and doesn't show empty space
+- [X] T040 [US3] Arrange furniture in library-layout.json to create distinct functional areas (reading, workspace, social)
+- [X] T041 [US3] Add natural pathways between furniture clusters in layout configuration
+- [X] T042 [US3] Position locked door prominently in south wall for clear exit visibility
 
 **Checkpoint**: All core user stories (1, 2, 3) should now be independently functional with complete exploration experience
 
@@ -126,23 +126,23 @@ Single project structure:
 
 ### Asset Creation for User Story 4
 
-- [ ] T043 [P] [US4] Create player sprite SVG in public/assets/sprites/characters/player.svg (48x48, pixel art)
-- [ ] T044 [P] [US4] Create desk sprite SVG in public/assets/sprites/environment/desk.svg (64x64, ornate European style)
-- [ ] T045 [P] [US4] Create tall bookshelf sprite SVG in public/assets/sprites/environment/bookshelf-tall.svg (64x128)
-- [ ] T046 [P] [US4] Create fireplace sprite SVG in public/assets/sprites/environment/fireplace.svg (128x128, stone/wood)
-- [ ] T047 [P] [US4] Create couch sprite SVG in public/assets/sprites/environment/couch.svg (96x48)
-- [ ] T048 [P] [US4] Create chair sprite SVG in public/assets/sprites/environment/chair.svg (32x32)
-- [ ] T049 [P] [US4] Create dining table sprite SVG in public/assets/sprites/environment/dining-table.svg (128x64)
-- [ ] T050 [P] [US4] Create window sprite SVG in public/assets/sprites/environment/window.svg (64x96, castle style)
-- [ ] T051 [P] [US4] Create trophy wall sprite SVG in public/assets/sprites/environment/trophy-wall.svg (128x64)
-- [ ] T052 [P] [US4] Create bar cart sprite SVG in public/assets/sprites/environment/bar-cart.svg (48x64)
-- [ ] T053 [P] [US4] Create locked door sprite SVG in public/assets/sprites/environment/locked-door.svg (96x128)
+- [X] T043 [P] [US4] Create player sprite SVG in public/assets/sprites/characters/player.svg (48x48, pixel art)
+- [X] T044 [P] [US4] Create desk sprite SVG in public/assets/sprites/environment/desk.svg (64x64, ornate European style)
+- [X] T045 [P] [US4] Create tall bookshelf sprite SVG in public/assets/sprites/environment/bookshelf-tall.svg (64x128)
+- [X] T046 [P] [US4] Create fireplace sprite SVG in public/assets/sprites/environment/fireplace.svg (128x128, stone/wood)
+- [X] T047 [P] [US4] Create couch sprite SVG in public/assets/sprites/environment/couch.svg (96x48)
+- [X] T048 [P] [US4] Create chair sprite SVG in public/assets/sprites/environment/chair.svg (32x32)
+- [X] T049 [P] [US4] Create dining table sprite SVG in public/assets/sprites/environment/dining-table.svg (128x64)
+- [X] T050 [P] [US4] Create window sprite SVG in public/assets/sprites/environment/window.svg (64x96, castle style)
+- [X] T051 [P] [US4] Create trophy wall sprite SVG in public/assets/sprites/environment/trophy-wall.svg (128x64)
+- [X] T052 [P] [US4] Create bar cart sprite SVG in public/assets/sprites/environment/bar-cart.svg (48x64)
+- [X] T053 [P] [US4] Create locked door sprite SVG in public/assets/sprites/environment/locked-door.svg (96x128)
 
 ### Implementation for User Story 4
 
-- [ ] T054 [US4] Verify all furniture sprites load with correct dimensions and pixel-perfect rendering
-- [ ] T055 [US4] Apply warm color palette (browns, grays, gold accents) consistent with cozy aesthetic
-- [ ] T056 [US4] Ensure European/German castle styling in furniture designs (ornate, cultured)
+- [X] T054 [US4] Verify all furniture sprites load with correct dimensions and pixel-perfect rendering
+- [X] T055 [US4] Apply warm color palette (browns, grays, gold accents) consistent with cozy aesthetic
+- [X] T056 [US4] Ensure European/German castle styling in furniture designs (ornate, cultured)
 
 **Checkpoint**: Complete visual atmosphere established - all user stories fully functional with proper aesthetic
 
@@ -152,11 +152,11 @@ Single project structure:
 
 **Purpose**: Connect library scene to start scene with smooth transitions
 
-- [ ] T057 Update StartScene to transition to LibraryScene on start button click in src/scenes/start-scene.ts
-- [ ] T058 Implement camera fade-out (500ms) before scene transition in StartScene
-- [ ] T059 Add camerafadeoutcomplete event listener to trigger scene.start('library-scene')
-- [ ] T060 Implement camera fade-in (500ms) at start of LibraryScene.create()
-- [ ] T061 Test complete scene transition flow from start to library
+- [X] T057 Update StartScene to transition to LibraryScene on start button click in src/scenes/start-scene.ts
+- [X] T058 Implement camera fade-out (500ms) before scene transition in StartScene
+- [X] T059 Add camerafadeoutcomplete event listener to trigger scene.start('library-scene')
+- [X] T060 Implement camera fade-in (500ms) at start of LibraryScene.create()
+- [X] T061 Test complete scene transition flow from start to library
 
 ---
 
@@ -164,8 +164,8 @@ Single project structure:
 
 **Purpose**: Final improvements and validation
 
-- [ ] T062 Add debug mode toggle with 'D' key to show/hide collision boxes
-- [ ] T063 [P] Verify pixel-perfect rendering with pixelArt: true and antialias: false
+- [X] T062 Add debug mode toggle with 'D' key to show/hide collision boxes
+- [X] T063 [P] Verify pixel-perfect rendering with pixelArt: true and antialias: false
 - [ ] T064 [P] Test FPS performance (30+ FPS target on modern browsers)
 - [ ] T065 Validate scene world size is exactly 2400x1600 pixels
 - [ ] T066 Verify furniture count meets minimum requirement (10+ pieces)
@@ -173,7 +173,7 @@ Single project structure:
 - [ ] T068 Verify player spawns at center (1200, 800) without obstructions
 - [ ] T069 Measure and validate traversal time (should be 10-15 seconds across scene)
 - [ ] T070 Test scene on Chrome, Firefox, and Safari browsers
-- [ ] T071 [P] Add console logging for scene lifecycle events (loaded, ready, player-spawned)
+- [X] T071 [P] Add console logging for scene lifecycle events (loaded, ready, player-spawned)
 - [ ] T072 Verify graceful degradation with fallback textures if assets fail
 - [ ] T073 Run through all acceptance scenarios from spec.md user stories
 - [ ] T074 Execute quickstart.md validation steps

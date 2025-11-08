@@ -95,8 +95,7 @@ export class StartScene extends Phaser.Scene {
 
     this.startButton.on('pointerup', () => {
       this.startButton.setScale(1.05);
-      // TODO: Transition to game scene when implemented
-      console.warn('Start button clicked - game scene not yet implemented');
+      this.handleStartClick();
     });
 
     // Fade in effect
@@ -284,6 +283,20 @@ export class StartScene extends Phaser.Scene {
     graphics.fillRect(x + halfW - cornerSize, y - halfH, cornerSize, cornerSize);
     graphics.fillRect(x - halfW, y + halfH - cornerSize, cornerSize, cornerSize);
     graphics.fillRect(x + halfW - cornerSize, y + halfH - cornerSize, cornerSize, cornerSize);
+  }
+
+  private handleStartClick(): void {
+    // Disable button to prevent double-clicks
+    this.startButton.disableInteractive();
+    
+    // Fade out
+    this.cameras.main.fadeOut(500, 0, 0, 0);
+    
+    // Wait for fade complete, then transition
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.stop();
+      this.scene.start('library-scene');
+    });
   }
 
   shutdown(): void {
