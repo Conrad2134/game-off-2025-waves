@@ -65,19 +65,10 @@ export class LibraryScene extends Phaser.Scene {
     // Load castle floor tileset
     this.load.image('castle-floor-tileset', 'assets/tilesets/castle-floor-tileset.png');
 
-    // Load environment sprites - use PNGs where available, SVG as fallback
+    // Load environment sprites
     this.load.image('desk', 'assets/sprites/environment/desk.png');
     this.load.image('bookshelf-tall', 'assets/sprites/environment/bookcase.png');
     this.load.image('dining-table', 'assets/sprites/environment/table.png');
-    
-    // SVG fallbacks
-    this.load.svg('fireplace', 'assets/sprites/environment/fireplace.svg', { width: 128, height: 128 });
-    this.load.svg('couch', 'assets/sprites/environment/couch.svg', { width: 96, height: 48 });
-    this.load.svg('chair', 'assets/sprites/environment/chair.svg', { width: 32, height: 32 });
-    this.load.svg('window', 'assets/sprites/environment/window.svg', { width: 64, height: 96 });
-    this.load.svg('trophy-wall', 'assets/sprites/environment/trophy-wall.svg', { width: 128, height: 64 });
-    this.load.svg('bar-cart', 'assets/sprites/environment/bar-cart.svg', { width: 48, height: 64 });
-    this.load.svg('locked-door', 'assets/sprites/environment/locked-door.svg', { width: 96, height: 128 });
   }
 
   /**

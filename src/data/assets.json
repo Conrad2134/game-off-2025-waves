@@ -5,66 +5,6 @@
       "width": 48,
       "height": 48,
       "type": "svg"
-    },
-    "desk": {
-      "path": "assets/sprites/environment/desk.svg",
-      "width": 64,
-      "height": 64,
-      "type": "svg"
-    },
-    "bookshelf-tall": {
-      "path": "assets/sprites/environment/bookshelf-tall.svg",
-      "width": 64,
-      "height": 128,
-      "type": "svg"
-    },
-    "fireplace": {
-      "path": "assets/sprites/environment/fireplace.svg",
-      "width": 128,
-      "height": 128,
-      "type": "svg"
-    },
-    "couch": {
-      "path": "assets/sprites/environment/couch.svg",
-      "width": 96,
-      "height": 48,
-      "type": "svg"
-    },
-    "chair": {
-      "path": "assets/sprites/environment/chair.svg",
-      "width": 32,
-      "height": 32,
-      "type": "svg"
-    },
-    "dining-table": {
-      "path": "assets/sprites/environment/dining-table.svg",
-      "width": 128,
-      "height": 64,
-      "type": "svg"
-    },
-    "window": {
-      "path": "assets/sprites/environment/window.svg",
-      "width": 64,
-      "height": 96,
-      "type": "svg"
-    },
-    "trophy-wall": {
-      "path": "assets/sprites/environment/trophy-wall.svg",
-      "width": 128,
-      "height": 64,
-      "type": "svg"
-    },
-    "bar-cart": {
-      "path": "assets/sprites/environment/bar-cart.svg",
-      "width": 48,
-      "height": 64,
-      "type": "svg"
-    },
-    "locked-door": {
-      "path": "assets/sprites/environment/locked-door.svg",
-      "width": 96,
-      "height": 128,
-      "type": "svg"
     }
   }
 }
