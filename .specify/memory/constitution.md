@@ -1,13 +1,15 @@
 <!--
 Sync Impact Report:
-Version change: N/A → 1.0.0 (Initial constitution)
-Modified principles: N/A (initial creation)
-Added sections: All sections (initial constitution)
-Removed sections: N/A
+Version change: 1.0.0 → 1.1.0 (New principle added)
+Modified principles: None
+Added sections: Principle VIII - AI-Assisted Asset Generation with PixelLab
+Removed sections: None
 Templates requiring updates:
-  ✅ .specify/templates/plan-template.md - Reviewed and aligned
-  ✅ .specify/templates/spec-template.md - Reviewed and aligned
-  ✅ .specify/templates/tasks-template.md - Reviewed and aligned
+  ✅ .specify/templates/plan-template.md - Reviewed, no updates needed
+  ✅ .specify/templates/spec-template.md - Reviewed, no updates needed
+  ✅ .specify/templates/tasks-template.md - Reviewed, no updates needed
+  ✅ .specify/templates/checklist-template.md - Reviewed, no updates needed
+  ✅ .specify/templates/agent-file-template.md - Reviewed, no updates needed
 Follow-up TODOs: None
 -->
 
@@ -77,6 +79,21 @@ Game state (investigation progress, clues discovered, character interactions) MU
 - State validation on load with version migration support
 
 **Rationale**: Mystery games require tracking complex state (who was questioned, what clues were found, what combinations were tried). Centralized state management prevents bugs and enables save/load functionality.
+
+### VIII. AI-Assisted Asset Generation with PixelLab
+Game pixel art assets (characters, animations, tilesets, map objects) SHOULD leverage the PixelLab MCP server for on-demand generation:
+- Character creation with 4 or 8 directional views (4: S/W/E/N, 8: adds diagonals)
+- Character animations using template animation IDs (walking, idle, etc.)
+- Top-down Wang tilesets for seamless terrain transitions (16-23 tiles)
+- Sidescroller tilesets for 2D platformer mechanics (16 tiles, transparent backgrounds)
+- Isometric tiles for 3D-looking game assets (recommended 32px+)
+- Map objects with transparent backgrounds and optional style-matching
+- All operations are non-blocking (return job IDs immediately, process in 2-5 minutes)
+- Assets automatically match pixel art rendering standards (pixelArt: true, integer coordinates)
+- Connected tileset system allows chaining using base_tile_ids for visual consistency
+- All generated assets stored permanently and accessible via download URLs
+
+**Rationale**: AI-assisted asset generation accelerates game development by providing production-ready pixel art on-demand. The PixelLab MCP integration enables "Vibe Coding" - generating game assets while writing code, eliminating art creation bottlenecks. Non-blocking operations allow queueing multiple assets without waiting, and the connected tileset system ensures visual consistency across terrain transitions. This aligns with our pixel art rendering standards and cozy/warm aesthetic goals while maintaining development velocity.
 
 ## Mystery Game Specific Constraints
 
@@ -166,4 +183,4 @@ This constitution establishes the architectural and quality standards for "Who A
 - Violations must be justified in implementation plan's "Complexity Tracking" section
 - Data-driven design takes precedence over code-based solutions
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-06 | **Last Amended**: 2025-11-06
+**Version**: 1.1.0 | **Ratified**: 2025-11-06 | **Last Amended**: 2025-11-08
