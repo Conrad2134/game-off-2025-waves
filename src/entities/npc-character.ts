@@ -9,6 +9,7 @@ export interface NPCCharacterConfig {
   metadata?: CharacterMetadata; // Character metadata including dialog
   speed?: number;
   wanderRadius?: number;
+  startPaused?: boolean; // Start with movement paused (for cutscenes)
 }
 
 /**
@@ -88,8 +89,13 @@ export class NPCCharacter extends Phaser.GameObjects.Container implements Intera
     body.setOffset(-28, -28);
     body.setImmovable(true); // NPCs can't be pushed by the player
 
-    // Start with a random idle period
-    this.idleTimer = Phaser.Math.Between(1000, 3000);
+    // Start with a random idle period (unless startPaused)
+    if (config.startPaused) {
+      this.isPaused = true;
+      this.idleTimer = 0;
+    } else {
+      this.idleTimer = Phaser.Math.Between(1000, 3000);
+    }
   }
 
   /**
@@ -288,6 +294,15 @@ export class NPCCharacter extends Phaser.GameObjects.Container implements Intera
     if (this.scene.textures.exists(idleKey)) {
       this.sprite.setTexture(idleKey);
     }
+  }
+
+  /**
+   * Set the home position for wandering behavior
+   */
+  public setHomePosition(x: number, y: number): void {
+    this.homePosition = { x, y };
+    // Optionally move the NPC to the new home position
+    this.setPosition(x, y);
   }
 
   /**

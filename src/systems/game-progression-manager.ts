@@ -85,6 +85,15 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
 
     this.initialized = true;
     console.log(`✓ GameProgressionManager initialized (phase: ${this.currentPhase})`);
+    
+    // Expose reset method to window for debugging
+    if (typeof window !== 'undefined') {
+      (window as any).resetGame = () => {
+        this.reset();
+        console.log('🔄 Game reset! Reload the page to start fresh.');
+      };
+      console.log('💡 Debug: Use window.resetGame() to clear save data');
+    }
   }
 
   /**

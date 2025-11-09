@@ -54,6 +54,10 @@ export class LibraryScene extends Phaser.Scene {
   // Progression system
   private progressionManager!: GameProgressionManager;
   private clueTracker!: ClueTracker;
+  
+  // Opening scene
+  private npcRoamingPositions: Map<string, { x: number; y: number }> = new Map();
+  private hasPlayedOpeningScene: boolean = false;
 
   constructor() {
     super({ key: 'library-scene' });
@@ -234,6 +238,23 @@ export class LibraryScene extends Phaser.Scene {
     this.events.emit('player-spawned', { position: this.player.getPosition() });
 
     console.log('✓ LibraryScene initialized successfully');
+    
+    // Start opening scene if this is the first time (pre-incident phase)
+    const currentPhase = this.progressionManager.getCurrentPhase();
+    console.log(`[Opening Scene] hasPlayedOpeningScene: ${this.hasPlayedOpeningScene}, currentPhase: ${currentPhase}`);
+    
+    // Opening scene should play on very first load (check if incident ready - meaning no NPCs introduced yet)
+    const allIntroduced = this.progressionManager.areAllNPCsIntroduced();
+    console.log(`[Opening Scene] All NPCs introduced: ${allIntroduced}`);
+    
+    if (!this.hasPlayedOpeningScene && currentPhase === 'pre-incident' && !allIntroduced) {
+      console.log('[Opening Scene] Scheduling opening scene to play in 1 second...');
+      this.time.delayedCall(1000, () => {
+        this.playOpeningScene();
+      });
+    } else {
+      console.log('[Opening Scene] Skipping - already played or not first time');
+    }
   }
 
   /**
@@ -365,28 +386,55 @@ export class LibraryScene extends Phaser.Scene {
    * Spawn NPC characters in the library
    */
   private spawnNPCs(): void {
+    // Initial gathered positions (in a semi-circle around center)
+    // Roaming positions (where they'll wander after opening scene)
     const npcConfigs = [
-      { name: 'valentin', x: 500, y: 350 },  // Near center-left
-      { name: 'sebastian', x: 700, y: 350 }, // Near center-right
-      { name: 'marianne', x: 400, y: 500 },  // Bottom-left area
-      { name: 'emma', x: 800, y: 500 },      // Bottom-right area
-      { name: 'luca', x: 600, y: 250 },      // Top-center area
+      { 
+        name: 'valentin', 
+        gatherX: 600, gatherY: 350,  // Center front (speaking position)
+        roamX: 500, roamY: 350,
+      },
+      { 
+        name: 'sebastian', 
+        gatherX: 650, gatherY: 400,  // Right of center
+        roamX: 700, roamY: 350,
+      },
+      { 
+        name: 'marianne', 
+        gatherX: 550, gatherY: 400,  // Left of center
+        roamX: 400, roamY: 500,
+      },
+      { 
+        name: 'emma', 
+        gatherX: 700, gatherY: 420,  // Far right
+        roamX: 800, roamY: 500,
+      },
+      { 
+        name: 'luca', 
+        gatherX: 500, gatherY: 420,  // Far left
+        roamX: 600, roamY: 250,
+      },
     ];
 
     npcConfigs.forEach(config => {
       // Load character metadata from cache
       const metadata = this.cache.json.get(`${config.name}-metadata`) as CharacterMetadata;
       
+      // Spawn at gathered position (start paused for opening scene)
       const npc = new NPCCharacter({
         scene: this,
-        x: config.x,
-        y: config.y,
+        x: config.gatherX,
+        y: config.gatherY,
         characterName: config.name,
         metadata: metadata,
         speed: 80,
         wanderRadius: 150,
+        startPaused: true, // Start paused for opening scene
       });
       this.npcs.push(npc);
+      
+      // Store roaming position for after opening scene
+      this.npcRoamingPositions.set(config.name, { x: config.roamX, y: config.roamY });
     });
 
     console.log(`✓ Spawned ${this.npcs.length} NPCs with dialog data`);
@@ -919,6 +967,20 @@ export class LibraryScene extends Phaser.Scene {
     // Update interaction detection
     this.interactionDetector.update();
 
+    // Handle opening scene dialog manually (bypasses dialog manager)
+    if (this.dialogBox.isVisible() && !this.dialogManager.isOpen()) {
+      // This is the opening scene dialog
+      if (Phaser.Input.Keyboard.JustDown(this.interactKey) || 
+          Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+        if (!this.dialogBox.nextPage()) {
+          // No more pages, close the dialog and trigger scene progression
+          this.dialogBox.hide();
+          this.events.emit('dialog-closed');
+        }
+      }
+      return; // Skip normal dialog handling
+    }
+
     // Handle interaction trigger (open dialog) - check this FIRST before handleInput consumes the key
     if (!this.dialogManager.isOpen() && this.interactionDetector.canInteract()) {
       if (Phaser.Input.Keyboard.JustDown(this.interactKey) || 
@@ -967,6 +1029,134 @@ export class LibraryScene extends Phaser.Scene {
    */
   public getPlayer(): PlayerCharacter {
     return this.player;
+  }
+
+  /**
+   * Play the opening scene where everyone is gathered and Valentin speaks
+   */
+  private playOpeningScene(): void {
+    this.hasPlayedOpeningScene = true;
+    console.log('🎬 Playing opening scene');
+
+    // Lock player movement
+    this.player.lockMovement();
+
+    // NPCs are already paused from spawn (startPaused: true)
+
+    // Find Valentin
+    const valentin = this.npcs.find(npc => npc.id === 'valentin');
+    if (!valentin) {
+      console.error('Valentin not found for opening scene!');
+      this.endOpeningScene();
+      return;
+    }
+
+    // Get Valentin's dialog data
+    const valentinDialog = this.cache.json.get('dialog-valentin');
+    if (!valentinDialog || !valentinDialog.introduction) {
+      console.error('Valentin introduction dialog not found!');
+      this.endOpeningScene();
+      return;
+    }
+
+    // Make everyone face Valentin
+    this.npcs.forEach(npc => {
+      if (npc.id !== 'valentin' && typeof npc.faceTowards === 'function') {
+        npc.faceTowards(valentin.x, valentin.y);
+      }
+    });
+
+    // Player also faces Valentin
+    // TODO: Make player face Valentin with proper direction calculation
+    // For now, player just stays in current position/direction
+
+    // Show Valentin's introduction directly using dialogBox
+    // Bypass dialog manager's phase system for opening cutscene
+    const introLines = valentinDialog.introduction.lines || [];
+    const fullMessage = introLines.join('\n\n');
+
+    this.dialogBox.show({
+      speaker: 'Valentin',
+      message: fullMessage,
+      type: 'npc',
+      characterId: 'valentin',
+      objectId: null,
+      recordInNotebook: valentinDialog.introduction.recordInNotebook || false,
+      notebookNote: valentinDialog.introduction.notebookNote,
+    });
+
+    // Record in notebook if needed
+    if (valentinDialog.introduction.recordInNotebook && this.notebookManager) {
+      this.notebookManager.addEntry({
+        id: `intro-valentin-${Date.now()}`,
+        category: 'npc',
+        sourceId: 'valentin',
+        sourceName: 'Valentin',
+        text: valentinDialog.introduction.notebookNote || valentinDialog.introduction.lines.join(' '),
+        timestamp: Date.now(),
+      });
+    }
+
+    // Listen for dialog close to trigger Valentin leaving
+    const onDialogClosed = () => {
+      this.events.off('dialog-closed', onDialogClosed);
+      this.valentinLeavesScene();
+    };
+    this.events.once('dialog-closed', onDialogClosed);
+  }
+
+  /**
+   * Valentin leaves the scene after his introduction
+   */
+  private valentinLeavesScene(): void {
+    console.log('🚶 Valentin leaving scene');
+
+    const valentin = this.npcs.find(npc => npc.id === 'valentin');
+    if (valentin) {
+      // Move Valentin off-screen (to kitchen area - top of screen)
+      const targetX = 600;
+      const targetY = -100; // Off screen top
+
+      // Create a tween to move Valentin
+      this.tweens.add({
+        targets: valentin,
+        x: targetX,
+        y: targetY,
+        duration: 2000,
+        ease: 'Linear',
+        onComplete: () => {
+          // Hide Valentin after he's off screen
+          valentin.setVisible(false);
+        },
+      });
+    }
+
+    // After a short delay, let everyone start roaming
+    this.time.delayedCall(2500, () => {
+      this.endOpeningScene();
+    });
+  }
+
+  /**
+   * End opening scene - unlock movement and let NPCs roam
+   */
+  private endOpeningScene(): void {
+    console.log('✅ Opening scene complete - free roam enabled');
+
+    // Unlock player movement
+    this.player.unlockMovement();
+
+    // Resume all NPCs (except Valentin who is off-screen)
+    this.npcs.forEach(npc => {
+      if (npc.id !== 'valentin' && typeof npc.resumeMovement === 'function') {
+        // Move NPCs to their roaming positions if we stored them
+        const roamPos = this.npcRoamingPositions.get(npc.id);
+        if (roamPos && typeof npc.setHomePosition === 'function') {
+          npc.setHomePosition(roamPos.x, roamPos.y);
+        }
+        npc.resumeMovement();
+      }
+    });
   }
 
   /**
