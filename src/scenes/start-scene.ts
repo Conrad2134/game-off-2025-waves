@@ -261,10 +261,12 @@ export class StartScene extends Phaser.Scene {
     localStorage.clear();
     console.log('🔄 Game data cleared!');
     this.resetButton.setText('Reset Complete!');
+    this.resetButton.setFontSize('24px'); // Slightly smaller to fit
     this.resetButton.setColor('#5c4033');
     this.resetButton.disableInteractive();
     this.time.delayedCall(1500, () => {
       this.resetButton.setText('Reset Game');
+      this.resetButton.setFontSize('28px'); // Back to original size
       this.resetButton.setColor('#b8941f');
       this.resetButton.setInteractive({ useHandCursor: true });
     });

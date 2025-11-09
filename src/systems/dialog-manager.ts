@@ -28,6 +28,7 @@ export class DialogManager {
   private dialogCache: Map<string, CharacterDialogData> = new Map();
   private currentNPCId: string | null = null;
   private currentTier: number = 0;
+  private isDialogOpen: boolean = false; // Track if this manager is controlling the dialog
   private keys: {
     interact: Phaser.Input.Keyboard.Key[];
     close: Phaser.Input.Keyboard.Key;

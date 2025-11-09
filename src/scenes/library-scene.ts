@@ -1149,21 +1149,35 @@ export class LibraryScene extends Phaser.Scene {
     console.log('[Valentin] Found in NPCs array:', !!valentin);
     
     if (valentin) {
-      // Make him walk off-screen (to kitchen area - top of screen)
+      // Make him walk to near the top edge, then fade out
       const targetX = 600;
-      const targetY = -100; // Off screen top
+      const targetY = 50; // Near top edge, but within bounds
 
       console.log(`[Valentin] Current position: (${Math.round(valentin.x)}, ${Math.round(valentin.y)})`);
       console.log(`[Valentin] Target position: (${targetX}, ${targetY})`);
-      console.log(`[Valentin] walkToPosition function exists:`, typeof valentin.walkToPosition === 'function');
+      
+      // Disable world bounds collision so he can walk to the edge
+      const body = valentin.body as Phaser.Physics.Arcade.Body;
+      if (body) {
+        body.setCollideWorldBounds(false);
+        console.log('[Valentin] Disabled world bounds collision');
+      }
       
       if (typeof valentin.walkToPosition === 'function') {
         console.log('[Valentin] 🚀 Calling walkToPosition...');
         valentin.walkToPosition(targetX, targetY, () => {
-          // Hide Valentin after he's off screen
-          console.log('[Valentin] 🎯 Reached destination, hiding sprite');
-          valentin.setVisible(false);
-          console.log('✅ Valentin has left the scene');
+          console.log('[Valentin] 🎯 Reached near-exit position, fading out...');
+          
+          // Fade out and then hide
+          this.tweens.add({
+            targets: valentin,
+            alpha: 0,
+            duration: 500,
+            onComplete: () => {
+              valentin.setVisible(false);
+              console.log('✅ Valentin has left the scene');
+            }
+          });
         });
         console.log('[Valentin] walkToPosition called successfully');
       } else {
