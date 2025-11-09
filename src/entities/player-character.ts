@@ -31,6 +31,7 @@ export class PlayerCharacter extends Phaser.GameObjects.Container {
 
     // Add to scene
     config.scene.add.existing(this);
+    this.setDepth(10); // Same as NPCs
 
     // Enable physics
     config.scene.physics.add.existing(this);
@@ -38,6 +39,7 @@ export class PlayerCharacter extends Phaser.GameObjects.Container {
     body.setCollideWorldBounds(true); // Prevent walking out of scene edges
     body.setSize(56, 56); // Scaled collision box (28 * 2)
     body.setOffset(-28, -28); // Center on container (14 * 2)
+    body.setImmovable(true); // Prevent NPCs from pushing the player
 
     // Setup input
     this.cursors = config.scene.input.keyboard!.createCursorKeys();
@@ -160,6 +162,12 @@ export class PlayerCharacter extends Phaser.GameObjects.Container {
     this.movementLocked = true;
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0, 0);
+    
+    // Stop animation and show idle frame
+    if (this.isMoving) {
+      this.isMoving = false;
+      this.stopAnimation();
+    }
   }
 
   /**

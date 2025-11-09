@@ -5221,5 +5221,8 @@
     }
   },
   "export_version": "1.0",
-  "export_date": "2025-11-09T03:04:14.936658"
+  "export_date": "2025-11-09T03:04:14.936658",
+  "dialog": {
+    "introduction": "Hey there! Name's Luca. This mystery is quite intriguing, isn't it? Count me in!"
+  }
 }

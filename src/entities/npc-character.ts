@@ -1,10 +1,12 @@
 import Phaser from 'phaser';
+import type { Interactable, DialogData, CharacterMetadata } from '../types/dialog';
 
 export interface NPCCharacterConfig {
   scene: Phaser.Scene;
   x: number;
   y: number;
   characterName: string; // e.g., 'valentin', 'sebastian'
+  metadata?: CharacterMetadata; // Character metadata including dialog
   speed?: number;
   wanderRadius?: number;
 }
@@ -17,8 +19,9 @@ export interface NPCCharacterConfig {
  * - 8-directional movement and animations
  * - Idle periods between movements
  * - Collision detection
+ * - Interactable dialog system
  */
-export class NPCCharacter extends Phaser.GameObjects.Container {
+export class NPCCharacter extends Phaser.GameObjects.Container implements Interactable {
   private sprite: Phaser.GameObjects.Sprite;
   private characterName: string;
   private speed: number;
@@ -29,6 +32,14 @@ export class NPCCharacter extends Phaser.GameObjects.Container {
   private targetPosition: { x: number; y: number } | null = null;
   private idleTimer: number = 0;
   private moveTimer: number = 0;
+  private isPaused: boolean = false; // Pause movement during dialog
+
+  // Interactable interface properties
+  public readonly id: string;
+  public readonly interactionRange: number = 80; // Increased from 50 for easier interaction
+  public readonly interactable: boolean = true;
+  public readonly dialogData: DialogData;
+  public readonly metadata: CharacterMetadata | null = null;
 
   constructor(config: NPCCharacterConfig) {
     super(config.scene, config.x, config.y);
@@ -38,13 +49,36 @@ export class NPCCharacter extends Phaser.GameObjects.Container {
     this.wanderRadius = config.wanderRadius ?? 200;
     this.homePosition = { x: config.x, y: config.y };
 
+    // Interactable interface initialization
+    this.id = config.characterName;
+    this.metadata = config.metadata ?? null;
+    
+    // Initialize dialog data with fallback
+    if (this.metadata && this.metadata.dialog) {
+      this.dialogData = this.metadata.dialog;
+    } else {
+      // Fallback dialog if metadata not provided
+      this.dialogData = {
+        introduction: `Hello, I'm ${config.characterName}.`
+      };
+      console.warn(`NPCCharacter: No metadata provided for ${config.characterName}, using fallback dialog`);
+    }
+
     // Create sprite
-    this.sprite = config.scene.add.sprite(0, 0, `${config.characterName}-idle-south`);
+    const spriteKey = `${config.characterName}-idle-south`;
+    this.sprite = config.scene.add.sprite(0, 0, spriteKey);
     this.sprite.setScale(2);
     this.add(this.sprite);
 
     // Add to scene
     config.scene.add.existing(this);
+    this.setDepth(10); // Above floor (5) and objects (5)
+    
+    // Add debug visual for interaction range
+    const debugCircle = config.scene.add.graphics();
+    debugCircle.lineStyle(2, 0x00ff00, 0.3);
+    debugCircle.strokeCircle(0, 0, this.interactionRange);
+    this.add(debugCircle);
 
     // Enable physics
     config.scene.physics.add.existing(this);
@@ -52,7 +86,7 @@ export class NPCCharacter extends Phaser.GameObjects.Container {
     body.setCollideWorldBounds(true);
     body.setSize(56, 56);
     body.setOffset(-28, -28);
-    body.setImmovable(true); // NPCs can't be pushed
+    body.setImmovable(true); // NPCs can't be pushed by the player
 
     // Start with a random idle period
     this.idleTimer = Phaser.Math.Between(1000, 3000);
@@ -62,6 +96,11 @@ export class NPCCharacter extends Phaser.GameObjects.Container {
    * Update NPC behavior - wandering AI
    */
   public update(delta: number): void {
+    // Skip update if paused (e.g., during dialog)
+    if (this.isPaused) {
+      return;
+    }
+
     const body = this.body as Phaser.Physics.Arcade.Body;
 
     if (this.isMoving && this.targetPosition) {
@@ -209,5 +248,61 @@ export class NPCCharacter extends Phaser.GameObjects.Container {
    */
   public getCharacterName(): string {
     return this.characterName;
+  }
+
+  /**
+   * Get display height (required by Interactable interface)
+   * Uses sprite's displayHeight since Container's displayHeight may not be accurate
+   */
+  public getDisplayHeight(): number {
+    return this.sprite.displayHeight;
+  }
+
+  /**
+   * Pause NPC movement (e.g., during dialog)
+   */
+  public pauseMovement(): void {
+    this.isPaused = true;
+    this.stopMoving();
+  }
+
+  /**
+   * Resume NPC movement
+   */
+  public resumeMovement(): void {
+    this.isPaused = false;
+    // Start with a new idle period
+    this.idleTimer = Phaser.Math.Between(500, 2000);
+  }
+
+  /**
+   * Make NPC face towards a specific position (e.g., the player)
+   */
+  public faceTowards(targetX: number, targetY: number): void {
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, targetX, targetY);
+    const direction = this.getDirectionFromAngle(angle);
+    this.currentDirection = direction;
+    
+    // Update sprite to idle frame in that direction
+    const idleKey = `${this.characterName}-idle-${direction}`;
+    if (this.scene.textures.exists(idleKey)) {
+      this.sprite.setTexture(idleKey);
+    }
+  }
+
+  /**
+   * Get the 8-directional direction string from an angle
+   */
+  private getDirectionFromAngle(angle: number): string {
+    let degrees = (angle * 180 / Math.PI + 360) % 360;
+    
+    if (degrees >= 337.5 || degrees < 22.5) return 'east';
+    if (degrees >= 22.5 && degrees < 67.5) return 'south-east';
+    if (degrees >= 67.5 && degrees < 112.5) return 'south';
+    if (degrees >= 112.5 && degrees < 157.5) return 'south-west';
+    if (degrees >= 157.5 && degrees < 202.5) return 'west';
+    if (degrees >= 202.5 && degrees < 247.5) return 'north-west';
+    if (degrees >= 247.5 && degrees < 292.5) return 'north';
+    return 'north-east';
   }
 }

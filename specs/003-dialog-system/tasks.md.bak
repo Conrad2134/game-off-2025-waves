@@ -25,9 +25,9 @@
 
 **Purpose**: Project initialization and type definitions for dialog system
 
-- [X] T001 [P] Create TypeScript type definitions file at src/types/dialog.ts based on contracts/types.ts
-- [X] T002 [P] Update character metadata JSON files with dialog.introduction field for all 6 characters (emma, klaus, luca, marianne, sebastian, valentin) in public/assets/sprites/characters/{name}/metadata.json
-- [X] T003 [P] Create or load interaction indicator sprite asset (simple icon/sprite for visual cue) at public/assets/ui/interaction-icon.png or generate placeholder programmatically
+- [ ] T001 [P] Create TypeScript type definitions file at src/types/dialog.ts based on contracts/types.ts
+- [ ] T002 [P] Update character metadata JSON files with dialog.introduction field for all 6 characters (emma, klaus, luca, marianne, sebastian, valentin) in public/assets/sprites/characters/{name}/metadata.json
+- [ ] T003 [P] Create or load interaction indicator sprite asset (simple icon/sprite for visual cue) at public/assets/ui/interaction-icon.png or generate placeholder programmatically
 
 **Checkpoint**: Type definitions and data assets ready for component implementation
 
@@ -39,9 +39,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [X] T004 Create DialogBox component implementing contracts/dialog-box.ts at src/components/dialog-box.ts (background graphics, text objects, show/hide methods)
-- [X] T005 Update NPCCharacter entity to implement Interactable interface in src/entities/npc-character.ts (add id, interactionRange, interactable, dialogData properties)
-- [X] T006 [P] Create InteractionIndicator component implementing visual cue system at src/components/interaction-indicator.ts (sprite with bob animation)
+- [ ] T004 Create DialogBox component implementing contracts/dialog-box.ts at src/components/dialog-box.ts (background graphics, text objects, show/hide methods)
+- [ ] T005 Update NPCCharacter entity to implement Interactable interface in src/entities/npc-character.ts (add id, interactionRange, interactable, dialogData properties)
+- [ ] T006 [P] Create InteractionIndicator component implementing visual cue system at src/components/interaction-indicator.ts (sprite with bob animation)
 
 **Checkpoint**: Foundation ready - dialog box can display, NPCs are interactable, indicators can show
 
@@ -55,15 +55,15 @@
 
 ### Implementation for User Story 1
 
-- [X] T007 [P] [US1] Create DialogManager system implementing contracts/dialog-manager.ts at src/systems/dialog-manager.ts (open/close methods, state management, player movement locking)
-- [X] T008 [P] [US1] Create InteractionDetector system implementing contracts/interaction-detector.ts at src/systems/interaction-detector.ts (proximity checks, closest entity detection)
-- [X] T009 [US1] Integrate DialogManager into LibraryScene at src/scenes/library-scene.ts (initialize in create method, add dialogManager property)
-- [X] T010 [US1] Integrate InteractionDetector into LibraryScene at src/scenes/library-scene.ts (initialize in create method, register all NPCs as interactables)
-- [X] T011 [US1] Add keyboard input handling for interaction keys (spacebar, enter, escape) in LibraryScene at src/scenes/library-scene.ts
-- [X] T012 [US1] Implement dialog open logic in LibraryScene.update() at src/scenes/library-scene.ts (detect interaction key press when player in range of NPC)
-- [X] T013 [US1] Implement dialog close logic in LibraryScene.update() at src/scenes/library-scene.ts (handle close key press and auto-close on distance threshold)
-- [X] T014 [US1] Load character metadata JSON files in LibraryScene.preload() at src/scenes/library-scene.ts (load all 6 character metadata files)
-- [X] T015 [US1] Pass loaded metadata to NPCCharacter constructors in LibraryScene.create() at src/scenes/library-scene.ts (ensure dialogData populated from metadata.dialog)
+- [ ] T007 [P] [US1] Create DialogManager system implementing contracts/dialog-manager.ts at src/systems/dialog-manager.ts (open/close methods, state management, player movement locking)
+- [ ] T008 [P] [US1] Create InteractionDetector system implementing contracts/interaction-detector.ts at src/systems/interaction-detector.ts (proximity checks, closest entity detection)
+- [ ] T009 [US1] Integrate DialogManager into LibraryScene at src/scenes/library-scene.ts (initialize in create method, add dialogManager property)
+- [ ] T010 [US1] Integrate InteractionDetector into LibraryScene at src/scenes/library-scene.ts (initialize in create method, register all NPCs as interactables)
+- [ ] T011 [US1] Add keyboard input handling for interaction keys (spacebar, enter, escape) in LibraryScene at src/scenes/library-scene.ts
+- [ ] T012 [US1] Implement dialog open logic in LibraryScene.update() at src/scenes/library-scene.ts (detect interaction key press when player in range of NPC)
+- [ ] T013 [US1] Implement dialog close logic in LibraryScene.update() at src/scenes/library-scene.ts (handle close key press and auto-close on distance threshold)
+- [ ] T014 [US1] Load character metadata JSON files in LibraryScene.preload() at src/scenes/library-scene.ts (load all 6 character metadata files)
+- [ ] T015 [US1] Pass loaded metadata to NPCCharacter constructors in LibraryScene.create() at src/scenes/library-scene.ts (ensure dialogData populated from metadata.dialog)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - player can talk to all NPCs and see their introductions
 
@@ -77,11 +77,11 @@
 
 ### Implementation for User Story 2
 
-- [X] T016 [P] [US2] Configure DialogBox visual styling in src/components/dialog-box.ts (background color: 0x000000 with 85% opacity, border: 4px white, dimensions: 900x150)
-- [X] T017 [P] [US2] Configure text rendering with pixel-perfect settings in src/components/dialog-box.ts (font resolution: 2x, word wrap enabled, font family selection)
-- [X] T018 [US2] Set DialogBox positioning and depth in src/components/dialog-box.ts (fixed to camera at x:512 y:680, depth:1000, scrollFactor:0)
-- [X] T019 [US2] Test text rendering with German special characters (ä, ö, ü, ß) by loading character dialog for all NPCs
-- [X] T020 [US2] Adjust text padding and layout in src/components/dialog-box.ts (20px padding, speaker name at top, message text below with proper spacing)
+- [ ] T016 [P] [US2] Configure DialogBox visual styling in src/components/dialog-box.ts (background color: 0x000000 with 85% opacity, border: 4px white, dimensions: 900x150)
+- [ ] T017 [P] [US2] Configure text rendering with pixel-perfect settings in src/components/dialog-box.ts (font resolution: 2x, word wrap enabled, font family selection)
+- [ ] T018 [US2] Set DialogBox positioning and depth in src/components/dialog-box.ts (fixed to camera at x:512 y:680, depth:1000, scrollFactor:0)
+- [ ] T019 [US2] Test text rendering with German special characters (ä, ö, ü, ß) by loading character dialog for all NPCs
+- [ ] T020 [US2] Adjust text padding and layout in src/components/dialog-box.ts (20px padding, speaker name at top, message text below with proper spacing)
 
 **Checkpoint**: Dialog UI is polished, readable, and visually consistent with pixel art aesthetic
 
@@ -95,12 +95,12 @@
 
 ### Implementation for User Story 3
 
-- [X] T021 [US3] Implement distance calculation in InteractionDetector.update() at src/systems/interaction-detector.ts (calculate squared distance to all interactables, check against interaction range)
-- [X] T022 [US3] Implement closest entity detection in InteractionDetector at src/systems/interaction-detector.ts (sort by distance, return closest in-range entity)
-- [X] T023 [US3] Implement indicator show/hide logic in InteractionDetector.update() at src/systems/interaction-detector.ts (show indicator above closest entity, hide when no entity in range)
-- [X] T024 [US3] Call InteractionDetector.update() in LibraryScene.update() at src/scenes/library-scene.ts (ensure proximity checks run every frame)
-- [X] T025 [US3] Implement indicator position tracking in InteractionIndicator at src/components/interaction-indicator.ts (update position to follow target entity)
-- [X] T026 [US3] Configure interaction range for each NPC in src/entities/npc-character.ts (default: 50 pixels, approximately 3-4 character widths)
+- [ ] T021 [US3] Implement distance calculation in InteractionDetector.update() at src/systems/interaction-detector.ts (calculate squared distance to all interactables, check against interaction range)
+- [ ] T022 [US3] Implement closest entity detection in InteractionDetector at src/systems/interaction-detector.ts (sort by distance, return closest in-range entity)
+- [ ] T023 [US3] Implement indicator show/hide logic in InteractionDetector.update() at src/systems/interaction-detector.ts (show indicator above closest entity, hide when no entity in range)
+- [ ] T024 [US3] Call InteractionDetector.update() in LibraryScene.update() at src/scenes/library-scene.ts (ensure proximity checks run every frame)
+- [ ] T025 [US3] Implement indicator position tracking in InteractionIndicator at src/components/interaction-indicator.ts (update position to follow target entity)
+- [ ] T026 [US3] Configure interaction range for each NPC in src/entities/npc-character.ts (default: 50 pixels, approximately 3-4 character widths)
 
 **Checkpoint**: Interaction indicators appear and disappear smoothly based on player proximity to NPCs
 
@@ -114,12 +114,12 @@
 
 ### Implementation for User Story 4
 
-- [X] T027 [P] [US4] Create InteractableObject class implementing Interactable interface at src/entities/interactable-object.ts (sprite-based object with dialogData for descriptions)
-- [X] T028 [P] [US4] Define object dialog data structure in src/entities/interactable-object.ts (dialog.description field for examination text)
-- [X] T029 [US4] Create sample interactable objects in LibraryScene.create() at src/scenes/library-scene.ts (bookshelf, locked door, furniture with descriptions)
-- [X] T030 [US4] Register interactable objects with InteractionDetector in LibraryScene.create() at src/scenes/library-scene.ts (add objects to detector's interactable list)
-- [X] T031 [US4] Update dialog open logic to handle both NPCs and objects in LibraryScene.update() at src/scenes/library-scene.ts (determine source type, pass appropriate speaker name or null)
-- [X] T032 [US4] Update DialogBox.show() to handle null speaker in src/components/dialog-box.ts (hide speaker text when speaker is null for object messages)
+- [ ] T027 [P] [US4] Create InteractableObject class implementing Interactable interface at src/entities/interactable-object.ts (sprite-based object with dialogData for descriptions)
+- [ ] T028 [P] [US4] Define object dialog data structure in src/entities/interactable-object.ts (dialog.description field for examination text)
+- [ ] T029 [US4] Create sample interactable objects in LibraryScene.create() at src/scenes/library-scene.ts (bookshelf, locked door, furniture with descriptions)
+- [ ] T030 [US4] Register interactable objects with InteractionDetector in LibraryScene.create() at src/scenes/library-scene.ts (add objects to detector's interactable list)
+- [ ] T031 [US4] Update dialog open logic to handle both NPCs and objects in LibraryScene.update() at src/scenes/library-scene.ts (determine source type, pass appropriate speaker name or null)
+- [ ] T032 [US4] Update DialogBox.show() to handle null speaker in src/components/dialog-box.ts (hide speaker text when speaker is null for object messages)
 
 **Checkpoint**: All user stories complete - players can talk to NPCs and examine objects using consistent dialog system
 
@@ -129,15 +129,15 @@
 
 **Purpose**: Improvements that affect multiple user stories and final validation
 
-- [X] T033 [P] Add validation for dialog message length in DialogManager at src/systems/dialog-manager.ts (max 500 chars, handle empty strings with fallback)
-- [X] T034 [P] Add error handling for missing metadata in NPCCharacter at src/entities/npc-character.ts (fallback message: "Hello, I'm {characterName}.")
-- [X] T035 Add input debouncing to prevent repeated dialog triggers in LibraryScene.update() at src/scenes/library-scene.ts (use Phaser.Input.Keyboard.JustDown() utility)
-- [X] T036 Test auto-close behavior with all NPCs at various distances (verify dialog closes when player moves beyond interaction range + 10 pixel buffer)
-- [X] T037 [P] Verify text wrapping works correctly for long messages in DialogBox at src/components/dialog-box.ts (test with 2-3 line messages)
-- [X] T038 [P] Test edge case: multiple NPCs in close proximity (verify only closest shows indicator and receives interaction)
-- [X] T039 [P] Test edge case: repeated spacebar presses while dialog open (verify system ignores additional presses until dialog closed)
-- [X] T040 Run through quickstart.md validation checklist (all 6 characters have introductions, all interaction scenarios work correctly)
-- [X] T041 [P] Update PROJECT_README.md or documentation with dialog system usage and extension points for future branching conversations
+- [ ] T033 [P] Add validation for dialog message length in DialogManager at src/systems/dialog-manager.ts (max 500 chars, handle empty strings with fallback)
+- [ ] T034 [P] Add error handling for missing metadata in NPCCharacter at src/entities/npc-character.ts (fallback message: "Hello, I'm {characterName}.")
+- [ ] T035 Add input debouncing to prevent repeated dialog triggers in LibraryScene.update() at src/scenes/library-scene.ts (use Phaser.Input.Keyboard.JustDown() utility)
+- [ ] T036 Test auto-close behavior with all NPCs at various distances (verify dialog closes when player moves beyond interaction range + 10 pixel buffer)
+- [ ] T037 [P] Verify text wrapping works correctly for long messages in DialogBox at src/components/dialog-box.ts (test with 2-3 line messages)
+- [ ] T038 [P] Test edge case: multiple NPCs in close proximity (verify only closest shows indicator and receives interaction)
+- [ ] T039 [P] Test edge case: repeated spacebar presses while dialog open (verify system ignores additional presses until dialog closed)
+- [ ] T040 Run through quickstart.md validation checklist (all 6 characters have introductions, all interaction scenarios work correctly)
+- [ ] T041 [P] Update PROJECT_README.md or documentation with dialog system usage and extension points for future branching conversations
 
 ---
 

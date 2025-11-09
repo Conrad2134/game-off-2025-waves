@@ -5221,5 +5221,8 @@
     }
   },
   "export_version": "1.0",
-  "export_date": "2025-11-09T03:04:04.472943"
+  "export_date": "2025-11-09T03:04:04.472943",
+  "dialog": {
+    "introduction": "Hi, I'm Emma! I was reading in the corner when I heard the commotion. Such a shame about the strudel."
+  }
 }

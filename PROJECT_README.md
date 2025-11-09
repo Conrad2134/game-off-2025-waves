@@ -4,8 +4,8 @@ A 2D pixel art mystery game built with Phaser 3, TypeScript, and Vite.
 
 ## Project Status
 
-**Current Feature**: 001-phaser-project-init  
-**Branch**: `001-phaser-project-init`
+**Current Feature**: 003-dialog-system  
+**Branch**: `003-dialog-system`
 
 ### Completed
 - ✅ Complete Phaser 3 project setup with TypeScript
@@ -14,6 +14,8 @@ A 2D pixel art mystery game built with Phaser 3, TypeScript, and Vite.
 - ✅ Home screen with title and start button (non-functional)
 - ✅ Pixel-perfect rendering configuration
 - ✅ Project structure following game framework
+- ✅ Library scene with player movement and NPCs
+- ✅ Complete dialog system with proximity-based interactions
 
 ## Quick Start
 
@@ -48,22 +50,37 @@ Open http://localhost:5173/ in your browser to see the game.
 src/
 ├── main.ts                 # Game initialization
 ├── scenes/                 # Game scenes
-│   └── start-scene.ts      # Home screen
+│   ├── start-scene.ts      # Home screen
+│   └── library-scene.ts    # Main game scene
 ├── entities/               # Game objects
+│   ├── player-character.ts # Playable character (Klaus)
+│   ├── npc-character.ts    # Non-player characters
+│   └── interactable-object.ts # Examinable objects
 ├── systems/                # Core game systems
+│   ├── dialog-manager.ts   # Dialog state management
+│   └── interaction-detector.ts # Proximity detection
 ├── components/             # UI components
+│   ├── dialog-box.ts       # Dialog UI display
+│   └── interaction-indicator.ts # Interaction visual cue
 ├── data/                   # JSON game content
+│   ├── assets.json
+│   └── library-layout.json
 ├── types/                  # TypeScript definitions
+│   ├── scenes.ts
+│   └── dialog.ts           # Dialog system types
 └── utils/                  # Helper utilities
 
 public/
-└── assets/                 # Game assets (sprites, audio, etc.)
+├── assets/                 # Game assets
+│   ├── sprites/
+│   │   ├── characters/     # Character sprites & metadata
+│   │   └── environment/    # Furniture and objects
+│   └── tilesets/           # Floor and wall tiles
 
 specs/
-└── 001-phaser-project-init/  # Feature specifications
-    ├── spec.md
-    └── checklists/
-        └── requirements.md
+├── 001-phaser-project-init/  # Feature specifications
+├── 002-library-scene/
+└── 003-dialog-system/
 ```
 
 ## Architecture
@@ -86,13 +103,56 @@ This game follows the Phaser 3 architecture outlined in `GAME_FRAMEWORK.md` and 
 
 ## Next Steps
 
-See the specification in `specs/001-phaser-project-init/spec.md` for implementation details.
+See the specifications in `specs/` for implementation details of completed features.
+
+### Dialog System Usage
+
+The dialog system is now fully integrated into the library scene:
+
+**Interacting with NPCs:**
+1. Walk your character (Klaus) near any NPC
+2. An interaction indicator appears above the NPC when you're in range
+3. Press **SPACE** or **ENTER** to open the dialog
+4. The NPC's introduction message appears in a dialog box at the bottom of the screen
+5. Press **SPACE**, **ENTER**, or **ESC** to close the dialog
+6. Dialog auto-closes if you walk too far away
+
+**Interacting with Objects:**
+- Same controls as NPCs
+- Objects display description text without a speaker name
+- Currently available objects: bookshelves, dining table, desk
+
+**Extending the Dialog System:**
+
+To add new interactable NPCs:
+```typescript
+const npc = new NPCCharacter({
+  scene: this,
+  x: 500, y: 300,
+  characterName: 'your-character',
+  metadata: characterMetadata, // Load from JSON
+});
+this.interactionDetector.registerInteractable(npc);
+```
+
+To add new interactable objects:
+```typescript
+const obj = new InteractableObject({
+  scene: this,
+  x: 400, y: 200,
+  spriteKey: 'your-sprite',
+  id: 'unique-id',
+  description: 'What the player sees when examining this object',
+});
+this.interactionDetector.registerInteractable(obj);
+```
 
 Future features will include:
-- Investigation scene with player movement
-- NPC interactions and dialogue system
-- Clue discovery and notebook UI
-- Mystery progression logic
+- Branching conversation trees based on game state
+- Dialog history UI (notebook)
+- Voice acting and sound effects
+- Multi-choice dialog options
+- Clue discovery through dialog
 
 ## License
 

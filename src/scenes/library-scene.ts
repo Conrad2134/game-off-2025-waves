@@ -1,12 +1,17 @@
 import Phaser from 'phaser';
 import { PlayerCharacter } from '../entities/player-character';
 import { NPCCharacter } from '../entities/npc-character';
+import { InteractableObject } from '../entities/interactable-object';
+import { DialogBox } from '../components/dialog-box';
+import { DialogManager } from '../systems/dialog-manager';
+import { InteractionDetector } from '../systems/interaction-detector';
 import type {
   LibraryLayoutConfig,
   FurnitureConfig,
   WallConfig,
   LibrarySceneData,
 } from '../types/scenes';
+import type { CharacterMetadata } from '../types/dialog';
 
 /**
  * LibraryScene - Main game environment for the locked-room mystery
@@ -21,12 +26,21 @@ import type {
 export class LibraryScene extends Phaser.Scene {
   private player!: PlayerCharacter;
   private npcs: NPCCharacter[] = [];
+  private interactableObjects: InteractableObject[] = [];
   private furnitureGroup!: Phaser.Physics.Arcade.StaticGroup;
   private wallsGroup!: Phaser.Physics.Arcade.StaticGroup;
   private sceneLayout!: LibraryLayoutConfig;
   private assetErrors: Map<string, boolean> = new Map();
   private debugMode: boolean = false;
   private debugGraphics?: Phaser.GameObjects.Graphics;
+  private debugText?: Phaser.GameObjects.Text;
+  
+  // Dialog system
+  private dialogBox!: DialogBox;
+  private dialogManager!: DialogManager;
+  private interactionDetector!: InteractionDetector;
+  private interactKey!: Phaser.Input.Keyboard.Key;
+  private enterKey!: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super({ key: 'library-scene' });
@@ -44,6 +58,12 @@ export class LibraryScene extends Phaser.Scene {
 
     // Load layout configuration
     this.load.json('library-layout', 'src/data/library-layout.json');
+
+    // Load character metadata for dialog system
+    const characterNames = ['klaus', 'valentin', 'sebastian', 'marianne', 'emma', 'luca'];
+    characterNames.forEach(charName => {
+      this.load.json(`${charName}-metadata`, `assets/sprites/characters/${charName}/metadata.json`);
+    });
 
     // Load Klaus character animations and idle sprites
     const directions = ['south', 'south-east', 'east', 'north-east', 'north', 'north-west', 'west', 'south-west'];
@@ -124,6 +144,9 @@ export class LibraryScene extends Phaser.Scene {
     // Spawn NPCs
     this.spawnNPCs();
 
+    // Spawn interactable objects
+    this.spawnInteractableObjects();
+
     // Setup camera
     this.cameras.main.setBounds(
       0,
@@ -134,6 +157,20 @@ export class LibraryScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setZoom(1.0);
     this.cameras.main.setRoundPixels(true); // Pixel-perfect rendering
+
+    // Initialize dialog system
+    this.initializeDialogSystem();
+
+    // Create debug text overlay
+    this.debugText = this.add.text(10, 10, '', {
+      fontFamily: 'monospace',
+      fontSize: '14px',
+      color: '#00ff00',
+      backgroundColor: '#000000aa',
+      padding: { x: 10, y: 10 }
+    });
+    this.debugText.setScrollFactor(0);
+    this.debugText.setDepth(10000);
 
     // Setup collisions
     this.physics.add.collider(this.player, this.furnitureGroup);
@@ -178,7 +215,29 @@ export class LibraryScene extends Phaser.Scene {
     // Update all NPCs
     this.npcs.forEach(npc => npc.update(delta));
 
-    // Debug info
+    // Update dialog system
+    this.updateDialogSystem();
+
+    // Update debug text
+    const closest = this.interactionDetector.getClosestInteractable();
+    const playerPos = this.player.getPosition();
+    let debugInfo = `Player: (${Math.round(playerPos.x)}, ${Math.round(playerPos.y)})\n`;
+    debugInfo += `NPCs: ${this.npcs.length} spawned\n`;
+    
+    // Show distance to each NPC
+    this.npcs.forEach(npc => {
+      const dist = Math.round(Phaser.Math.Distance.Between(playerPos.x, playerPos.y, npc.x, npc.y));
+      debugInfo += `  ${npc.id}: ${dist}px ${dist <= 80 ? '✓' : ''}\n`;
+    });
+    
+    debugInfo += `Closest: ${closest ? `${closest.id} at ${Math.round(Phaser.Math.Distance.Between(playerPos.x, playerPos.y, closest.x, closest.y))}px` : 'none'}\n`;
+    debugInfo += `Can interact: ${this.interactionDetector.canInteract() ? 'YES' : 'NO'}`;
+    
+    if (this.debugText) {
+      this.debugText.setText(debugInfo);
+    }
+
+    // Debug info (old)
     if (this.debugMode) {
       const pos = this.player.getPosition();
       console.log(`Player: (${Math.round(pos.x)}, ${Math.round(pos.y)})`);
@@ -269,26 +328,80 @@ export class LibraryScene extends Phaser.Scene {
    */
   private spawnNPCs(): void {
     const npcConfigs = [
-      { name: 'valentin', x: 300, y: 200 },
-      { name: 'sebastian', x: 900, y: 300 },
-      { name: 'marianne', x: 400, y: 600 },
-      { name: 'emma', x: 800, y: 500 },
-      { name: 'luca', x: 200, y: 500 },
+      { name: 'valentin', x: 500, y: 350 },  // Near center-left
+      { name: 'sebastian', x: 700, y: 350 }, // Near center-right
+      { name: 'marianne', x: 400, y: 500 },  // Bottom-left area
+      { name: 'emma', x: 800, y: 500 },      // Bottom-right area
+      { name: 'luca', x: 600, y: 250 },      // Top-center area
     ];
 
     npcConfigs.forEach(config => {
+      // Load character metadata from cache
+      const metadata = this.cache.json.get(`${config.name}-metadata`) as CharacterMetadata;
+      
       const npc = new NPCCharacter({
         scene: this,
         x: config.x,
         y: config.y,
         characterName: config.name,
+        metadata: metadata,
         speed: 80,
         wanderRadius: 150,
       });
       this.npcs.push(npc);
     });
 
-    console.log(`✓ Spawned ${this.npcs.length} NPCs`);
+    console.log(`✓ Spawned ${this.npcs.length} NPCs with dialog data`);
+  }
+
+  /**
+   * Spawn interactable objects in the library
+   */
+  private spawnInteractableObjects(): void {
+    // Find existing furniture sprites and make some of them interactable
+    const objectConfigs = [
+      {
+        id: 'bookshelf-north',
+        spriteKey: 'bookshelf-tall',
+        x: 600,
+        y: 100,
+        description: 'A tall bookshelf filled with old mystery novels. The books look well-read and dusty.',
+      },
+      {
+        id: 'dining-table',
+        spriteKey: 'dining-table',
+        x: 600,
+        y: 400,
+        description: 'A large wooden dining table. This is where the stolen Erdbeerstrudel was last seen!',
+      },
+      {
+        id: 'desk',
+        spriteKey: 'desk',
+        x: 200,
+        y: 300,
+        description: 'A sturdy oak desk with scattered papers and an inkwell. Someone has been taking notes.',
+      },
+    ];
+
+    objectConfigs.forEach(config => {
+      try {
+        const obj = new InteractableObject({
+          scene: this,
+          x: config.x,
+          y: config.y,
+          spriteKey: config.spriteKey,
+          id: config.id,
+          description: config.description,
+          interactionRange: 60,
+        });
+        obj.setDepth(5); // Above floor, below NPCs
+        this.interactableObjects.push(obj);
+      } catch (error) {
+        console.warn(`Failed to create interactable object ${config.id}:`, error);
+      }
+    });
+
+    console.log(`✓ Spawned ${this.interactableObjects.length} interactable objects`);
   }
 
   /**
@@ -488,6 +601,111 @@ export class LibraryScene extends Phaser.Scene {
       }
 
       console.log('Debug mode: OFF');
+    }
+  }
+
+  /**
+   * Initialize dialog system components
+   */
+  private initializeDialogSystem(): void {
+    // Create dialog box
+    this.dialogBox = new DialogBox({
+      scene: this,
+      x: 512, // Center of 1024px screen
+      y: 680, // Bottom third
+      width: 900,
+      height: 150,
+      padding: 20,
+      backgroundColor: 0x000000,
+      borderColor: 0xffffff,
+      borderWidth: 4,
+      depth: 1000,
+    });
+
+    // Create dialog manager
+    this.dialogManager = new DialogManager({
+      scene: this,
+      player: this.player,
+      dialogBox: this.dialogBox,
+      maxHistorySize: 50,
+    });
+
+    // Create interaction detector
+    this.interactionDetector = new InteractionDetector({
+      scene: this,
+      player: this.player,
+      indicatorConfig: {
+        spriteKey: 'interaction-icon',
+        offsetY: -30,
+        animationDuration: 800,
+        animationRange: 5,
+      },
+    });
+
+    // Register all NPCs as interactable
+    this.npcs.forEach(npc => {
+      this.interactionDetector.registerInteractable(npc);
+    });
+
+    // Register all interactable objects
+    this.interactableObjects.forEach(obj => {
+      this.interactionDetector.registerInteractable(obj);
+    });
+
+    // Setup interaction keys
+    this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+
+    console.log('✓ Dialog system initialized');
+  }
+
+  /**
+   * Update dialog system logic (called every frame)
+   */
+  private updateDialogSystem(): void {
+    // Update interaction detection
+    this.interactionDetector.update();
+
+    // Handle interaction trigger (open dialog) - check this FIRST before handleInput consumes the key
+    if (!this.dialogManager.isOpen() && this.interactionDetector.canInteract()) {
+      if (Phaser.Input.Keyboard.JustDown(this.interactKey) || 
+          Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+        const entity = this.interactionDetector.getClosestInteractable();
+        if (entity) {
+          // Determine if it's an NPC or object
+          const isNPC = entity instanceof NPCCharacter;
+          const sourceType = isNPC ? 'npc' : 'object';
+          
+          // Get speaker name (only for NPCs)
+          let speakerName: string | null = null;
+          if (isNPC) {
+            const npc = entity as NPCCharacter;
+            speakerName = npc.metadata?.character?.name ?? entity.id;
+          }
+          
+          this.dialogManager.open(
+            entity.dialogData,
+            sourceType,
+            entity.id,
+            speakerName,
+            entity // Pass entity so it can be paused during dialog
+          );
+        }
+      }
+    }
+
+    // Handle dialog input (closing) - only when dialog is open
+    if (this.dialogManager.isOpen()) {
+      this.dialogManager.handleInput();
+    }
+
+    // Auto-close dialog if player moves out of range
+    if (this.dialogManager.isOpen()) {
+      const entity = this.interactionDetector.getClosestInteractable();
+      if (!entity) {
+        // No entity in range, close dialog
+        this.dialogManager.close();
+      }
     }
   }
 
