@@ -5,6 +5,7 @@ Auto-generated from all feature plans. Last updated: 2025-11-07
 ## Active Technologies
 - TypeScript 5.0+ (ES2020 target, strict mode enabled) + Phaser 3.80.0 (game framework), Vite 5.0.0 (build tool) (003-dialog-system)
 - JSON files for dialog content (character metadata.json files), no persistent storage needed (003-dialog-system)
+- JSON data files for dialog/clues, browser LocalStorage for state persistence (004-game-progression)
 
 - TypeScript 5.0+ + Phaser 3.80.0, Vite 5.0.0 (002-library-scene)
 
@@ -25,6 +26,7 @@ npm test && npm run lint
 TypeScript 5.0+: Follow standard conventions
 
 ## Recent Changes
+- 004-game-progression: Added TypeScript 5.0+ (ES2020 target, strict mode enabled) + Phaser 3.80.0 (game framework), Vite 5.0.0 (build tool)
 - 003-dialog-system: Added TypeScript 5.0+ (ES2020 target, strict mode enabled) + Phaser 3.80.0 (game framework), Vite 5.0.0 (build tool)
 
 - 002-library-scene: Added TypeScript 5.0+ + Phaser 3.80.0, Vite 5.0.0

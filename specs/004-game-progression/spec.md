@@ -5,6 +5,16 @@
 **Status**: Draft  
 **Input**: User description: "Start building the system for the game to actually progress. We'll want an initial scene where Valentin is thanking everyone for being at the party, he'll tell everyone that he prepared his famous erdbeerstrudel and he's going to go get it. Meanwhile, the player can go around and talk to all of the NPCs and introduce themselves / give a bit of backstory, a bit of which will be recorded in the notebook. Then, after the player has introduced themselves to everyone, Valentine rushes in and is distraught - someone ate his erdbeerstrudel and he knows it was someone in this room. He goes to lock the door and guard it, saying that no one is leaving until he finds out who did it. Then, the player can go around and search for clues and talk to people, progressively uncovering more information. The dialog will change from NPCs as more clues are uncovered to reveal more information. Once the player feels they have enough infromation, they can make an accusation by talking to Valentin (out of scope for now)."
 
+## Clarifications
+
+### Session 2025-11-09
+
+- Q: The specification mentions "at least 5 discoverable clues" but doesn't clarify if all clues are immediately visible/accessible after the incident, or if some unlock based on other discoveries. → A: All clues physically present but some require talking to NPCs first to "unlock" investigation
+- Q: How many distinct dialog progression tiers should each NPC have after the incident? → A: 4 tiers (as specified: 0, 1-2, 3-4, 5+ clues)
+- Q: Should locked clues have visual indicators showing they're currently locked, or appear as regular environment objects until unlocked? → A: Appear with subtle highlight that changes when unlocked
+- Q: What proportion of the 5+ clues should be immediately investigable vs requiring unlock conversations? → A: 2 immediately investigable, 3+ require unlocking
+- Q: When an NPC unlocks a clue during conversation, should the player be able to immediately investigate it mid-conversation, or must they complete the dialog first? → A: Must complete current dialog before clue becomes investigable
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Party Introduction Phase (Priority: P1)
@@ -91,6 +101,7 @@ After the incident, NPC conversations change based on how many clues the player 
 - What happens when the player tries to access the door before the incident? (No special interaction; it's just scenery)
 - What happens when the player tries to interact with Valentin before completing all introductions? (He gives a friendly "please enjoy the party" message)
 - What happens when the player tries to re-read notebook entries during a conversation? (Notebook can be opened anytime; pauses/overlays current dialog)
+- What happens when an NPC unlocks a clue mid-conversation and the player tries to investigate it immediately? (Clue remains locked with subtle highlight until dialog completes, then becomes investigable with prominent highlight)
 
 ## Requirements *(mandatory)*
 
@@ -107,7 +118,7 @@ After the incident, NPC conversations change based on how many clues the player 
 - **FR-009**: System MUST visually lock the door after Valentin's accusation
 - **FR-010**: System MUST prevent player exit via the door after it's locked
 - **FR-011**: System MUST track the game phase (pre-incident, post-incident)
-- **FR-012**: System MUST provide at least 5 discoverable clues in the environment
+- **FR-012**: System MUST provide at least 5 discoverable clues in the environment (2 immediately investigable after incident, 3+ require NPC conversations to unlock)
 - **FR-013**: System MUST track which clues have been discovered by the player
 - **FR-014**: System MUST record discovered clues in the player's notebook with descriptions
 - **FR-015**: System MUST change NPC dialog content based on the number of clues discovered
@@ -117,6 +128,9 @@ After the incident, NPC conversations change based on how many clues the player 
 - **FR-019**: System MUST allow only one active dialog at a time
 - **FR-020**: System MUST allow notebook access during any game phase
 - **FR-021**: System MUST persist notebook entries throughout the game session
+- **FR-022**: System MUST support clue unlocking through NPC dialog interactions (certain clues become investigable only after specific conversations)
+- **FR-023**: System MUST display locked clues with subtle visual highlight that changes to more prominent highlight when unlocked
+- **FR-024**: System MUST prevent clue investigation during active dialog (unlocked clues become investigable only after current conversation completes)
 
 ### Key Entities
 
@@ -124,9 +138,9 @@ After the incident, NPC conversations change based on how many clues the player 
 
 - **NPC Character**: Represents each party guest with unique identity (name, sprite, position). Contains multiple dialog sets that change based on game phase and investigation progress. Tracks introduction status.
 
-- **Clue**: Represents discoverable evidence in the environment. Contains location, interaction radius, description, and discovery status. Has visual representation (sprite/highlight) and contributes to investigation progress count.
+- **Clue**: Represents discoverable evidence in the environment. Contains location, interaction radius, description, discovery status, and unlock condition (2 immediately investigable, 3+ require specific NPC conversations). Has visual representation with two highlight states: subtle highlight when locked, more prominent highlight when unlocked and investigable. Unlocked clues become investigable only after the unlocking conversation completes. Contributes to investigation progress count when discovered.
 
-- **Dialog Set**: Collection of conversation lines for an NPC in a specific context. Categorized by phase (introduction, post-incident) and progression tier (clue count thresholds). Contains ordered dialog lines and notebook recording flags.
+- **Dialog Set**: Collection of conversation lines for an NPC in a specific context. Categorized by phase (introduction, post-incident) and progression tier (exactly 4 tiers post-incident: 0 clues, 1-2 clues, 3-4 clues, 5+ clues). Contains ordered dialog lines and notebook recording flags.
 
 - **Notebook Entry**: Record of information learned during gameplay. Types include character introductions, clues discovered, and incident details. Contains timestamp, category, title, and content text.
 
