@@ -1,0 +1,78 @@
+{
+  "characterId": "marianne",
+  "characterName": "Marianne",
+  "introduction": {
+    "lines": [
+      "Hello, dear. I'm Marianne. So lovely to meet you.",
+      "Valentin's parties are always so refined and elegant.",
+      "I've been trying to get his erdbeerstrudel recipe for years, but he won't share it!"
+    ],
+    "recordInNotebook": true,
+    "notebookNote": "Marianne has been trying to get Valentin's recipe for years. Interested in his secrets?"
+  },
+  "postIncident": [
+    {
+      "tier": 0,
+      "requiredClues": 0,
+      "lines": [
+        "How absolutely dreadful! Poor Valentin must be devastated.",
+        "I was near the window, enjoying the view.",
+        "I certainly didn't see anyone tampering with the strudel."
+      ],
+      "followUpLines": [
+        "This is such an unfortunate situation.",
+        "I do hope this gets resolved quickly.",
+        "Being trapped here is rather uncomfortable, don't you think?"
+      ],
+      "recordInNotebook": false
+    },
+    {
+      "tier": 1,
+      "requiredClues": 1,
+      "lines": [
+        "Oh, you found something? How clever of you.",
+        "I suppose we all have our little secrets, don't we?",
+        "I may have been a bit closer to the dessert table than I initially admitted..."
+      ],
+      "followUpLines": [
+        "But that doesn't mean anything!",
+        "I was merely admiring the presentation.",
+        "Valentin has such excellent taste in desserts."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Marianne admits she was closer to the dessert table than she first said. Suspicious."
+    },
+    {
+      "tier": 2,
+      "requiredClues": 3,
+      "lines": [
+        "You're quite persistent, aren't you?",
+        "Very well. I'll share what I know.",
+        "I saw Klaus near the strudel earlier. He seemed... contemplative. Perhaps even critical."
+      ],
+      "followUpLines": [
+        "You know about their old rivalry, don't you?",
+        "Klaus has always been competitive with Valentin.",
+        "I'm just suggesting you keep that in mind."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Marianne saw Klaus near the strudel looking critical. Pointing fingers or being helpful?"
+    },
+    {
+      "tier": 3,
+      "requiredClues": 5,
+      "lines": [
+        "You've discovered everything, haven't you? You're quite thorough.",
+        "I suppose honesty is the best policy now.",
+        "Yes, I took a slice. I couldn't help myself! But there was plenty left when I walked away."
+      ],
+      "followUpLines": [
+        "I've wanted to taste it for so long...",
+        "But I only had one piece! Someone else must have eaten the rest.",
+        "You must believe me. I'm not entirely to blame here."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Marianne confesses to taking a slice but insists she left plenty. Another partial confession?"
+    }
+  ]
+}

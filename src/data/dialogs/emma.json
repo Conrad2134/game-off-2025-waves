@@ -1,0 +1,79 @@
+{
+  "characterId": "emma",
+  "characterName": "Emma",
+  "introduction": {
+    "lines": [
+      "Oh, hello! I'm Emma. Lovely to meet you.",
+      "Valentin always throws such wonderful parties.",
+      "I can't wait to try his erdbeerstrudel - everyone raves about it!"
+    ],
+    "recordInNotebook": true,
+    "notebookNote": "Emma seems excited about the party and Valentin's famous strudel."
+  },
+  "postIncident": [
+    {
+      "tier": 0,
+      "requiredClues": 0,
+      "lines": [
+        "This is terrible! Who would do such a thing?",
+        "I was near the bookshelf when Valentin left for the kitchen.",
+        "I didn't see anyone go near the strudel, I swear!"
+      ],
+      "followUpLines": [
+        "I really didn't see anything suspicious.",
+        "Maybe someone from the other side of the room?",
+        "This is so awkward... I just wanted to enjoy the party."
+      ],
+      "recordInNotebook": false
+    },
+    {
+      "tier": 1,
+      "requiredClues": 1,
+      "lines": [
+        "You found something? What is it?",
+        "Oh... well, I suppose everyone was moving around a lot.",
+        "Have you checked Valentin's desk? He keeps all sorts of papers there."
+      ],
+      "followUpLines": [
+        "Did you look at the desk yet?",
+        "I'm sure it wasn't me... right?",
+        "This whole situation is making me nervous."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Emma suggested checking Valentin's desk. Why would she know about papers there?",
+      "unlocksClues": ["desk-papers"]
+    },
+    {
+      "tier": 2,
+      "requiredClues": 3,
+      "lines": [
+        "You're really getting close to solving this, aren't you?",
+        "I... I have to admit something.",
+        "I wasn't entirely honest before. I did see someone near the dessert table, but I don't want to accuse anyone without proof."
+      ],
+      "followUpLines": [
+        "It's hard to know who to trust right now.",
+        "Everyone seems suspicious when you look closely enough.",
+        "I hope this gets resolved soon. The tension is unbearable."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Emma admits she saw someone near the dessert table but won't say who. Protecting someone?"
+    },
+    {
+      "tier": 3,
+      "requiredClues": 5,
+      "lines": [
+        "You've found everything, haven't you?",
+        "I suppose there's no point hiding it anymore.",
+        "The person I saw... was Luca. But please, don't tell him I told you!"
+      ],
+      "followUpLines": [
+        "I shouldn't have said anything...",
+        "What if I'm wrong? What if it wasn't Luca?",
+        "Please be discreet with this information."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Emma finally admits she saw Luca near the dessert table. Is she telling the truth or deflecting?"
+    }
+  ]
+}

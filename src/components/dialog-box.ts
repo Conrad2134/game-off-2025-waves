@@ -17,7 +17,10 @@ export class DialogBox {
   private background: Phaser.GameObjects.Graphics;
   private speakerText: Phaser.GameObjects.Text;
   private messageText: Phaser.GameObjects.Text;
+  private continueText: Phaser.GameObjects.Text;
   private currentMessage: DialogMessage | null = null;
+  private messagePages: string[] = [];
+  private currentPageIndex: number = 0;
 
   // Configuration
   private width: number;
@@ -77,6 +80,22 @@ export class DialogBox {
     );
     this.messageText.setResolution(2); // Crisp pixel rendering
     this.container.add(this.messageText);
+
+    // Create continue indicator (shown when there are more pages)
+    this.continueText = this.scene.add.text(
+      this.width / 2 - this.padding - 10,
+      this.height / 2 - this.padding - 5,
+      '▼',
+      {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '20px',
+        color: '#ffff00',
+      }
+    );
+    this.continueText.setOrigin(1, 1);
+    this.continueText.setResolution(2);
+    this.continueText.setVisible(false);
+    this.container.add(this.continueText);
   }
 
   /**
@@ -110,6 +129,7 @@ export class DialogBox {
   public show(message: DialogMessage): void {
     this.validateMessage(message);
     this.currentMessage = message;
+    this.currentPageIndex = 0;
 
     // Update speaker text (hide if null)
     if (message.speaker) {
@@ -119,8 +139,8 @@ export class DialogBox {
       this.speakerText.setVisible(false);
     }
 
-    // Update message text
-    this.messageText.setText(message.message);
+    // Paginate the message
+    this.messagePages = this.paginateMessage(message.message);
     
     // Adjust message text position based on speaker visibility
     if (message.speaker) {
@@ -129,8 +149,89 @@ export class DialogBox {
       this.messageText.setY(-this.height / 2 + this.padding);
     }
 
+    // Display first page
+    this.displayCurrentPage();
+
     // Show container
     this.container.setVisible(true);
+  }
+
+  /**
+   * Paginate message into chunks that fit in the dialog box
+   */
+  private paginateMessage(message: string): string[] {
+    const maxCharsPerPage = 180; // Approximate character limit per page
+    const pages: string[] = [];
+    
+    // Split by sentences first
+    const sentences = message.match(/[^.!?]+[.!?]+/g) || [message];
+    let currentPage = '';
+    
+    for (const sentence of sentences) {
+      const trimmedSentence = sentence.trim();
+      
+      // If adding this sentence would exceed limit, start new page
+      if (currentPage.length + trimmedSentence.length > maxCharsPerPage && currentPage.length > 0) {
+        pages.push(currentPage.trim());
+        currentPage = trimmedSentence;
+      } else {
+        currentPage += (currentPage.length > 0 ? ' ' : '') + trimmedSentence;
+      }
+    }
+    
+    // Add remaining content
+    if (currentPage.trim().length > 0) {
+      pages.push(currentPage.trim());
+    }
+    
+    return pages.length > 0 ? pages : [message];
+  }
+
+  /**
+   * Display the current page
+   */
+  private displayCurrentPage(): void {
+    if (this.messagePages.length === 0) return;
+    
+    this.messageText.setText(this.messagePages[this.currentPageIndex]);
+    
+    // Show/hide continue indicator
+    this.continueText.setVisible(this.hasNextPage());
+  }
+
+  /**
+   * Advance to the next page
+   * @returns true if advanced, false if already on last page
+   */
+  public nextPage(): boolean {
+    if (!this.hasNextPage()) {
+      return false;
+    }
+    
+    this.currentPageIndex++;
+    this.displayCurrentPage();
+    return true;
+  }
+
+  /**
+   * Check if there's a next page
+   */
+  public hasNextPage(): boolean {
+    return this.currentPageIndex < this.messagePages.length - 1;
+  }
+
+  /**
+   * Get current page number (1-indexed)
+   */
+  public getCurrentPage(): number {
+    return this.currentPageIndex + 1;
+  }
+
+  /**
+   * Get total number of pages
+   */
+  public getTotalPages(): number {
+    return this.messagePages.length;
   }
 
   /**
@@ -139,6 +240,9 @@ export class DialogBox {
   public hide(): void {
     this.container.setVisible(false);
     this.currentMessage = null;
+    this.messagePages = [];
+    this.currentPageIndex = 0;
+    this.continueText.setVisible(false);
   }
 
   /**
@@ -162,11 +266,6 @@ export class DialogBox {
     if (!message.message || message.message.trim().length === 0) {
       console.warn('DialogBox: Empty message provided, using fallback');
       message.message = 'No dialog available.';
-    }
-
-    if (message.message.length > 500) {
-      console.warn('DialogBox: Message exceeds 500 characters, truncating');
-      message.message = message.message.substring(0, 497) + '...';
     }
 
     if (message.speaker && message.speaker.length > 50) {

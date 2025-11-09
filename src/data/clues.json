@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "clues": [
+    {
+      "id": "strudel-crumbs",
+      "name": "Pastry Crumbs",
+      "description": "Small pastry crumbs scattered near the dining table. They smell like strawberries and vanilla - definitely from Valentin's famous erdbeerstrudel.",
+      "position": { "x": 950, "y": 420 },
+      "spriteKey": "clue-crumbs",
+      "displaySize": { "width": 32, "height": 32 },
+      "interactionRange": 60,
+      "state": "locked",
+      "initiallyUnlocked": true,
+      "notebookNote": "Pastry crumbs near the table - strawberry and vanilla scent"
+    },
+    {
+      "id": "suspicious-napkin",
+      "name": "Stained Napkin",
+      "description": "A crumpled napkin with red stains. Upon closer inspection, it appears to be strawberry jam. Someone wasn't very careful cleaning up.",
+      "position": { "x": 800, "y": 650 },
+      "spriteKey": "clue-napkin",
+      "displaySize": { "width": 32, "height": 32 },
+      "interactionRange": 60,
+      "state": "locked",
+      "initiallyUnlocked": true,
+      "notebookNote": "Napkin with strawberry jam stains - carelessly discarded"
+    },
+    {
+      "id": "desk-papers",
+      "name": "Crossed-Out Recipe",
+      "description": "Scattered papers on Valentin's desk. One sheet has his erdbeerstrudel recipe with angry crossed-out notes: 'Too sweet!' and 'Needs improvement!' Someone wasn't happy with the original version.",
+      "position": { "x": 200, "y": 300 },
+      "spriteKey": "clue-papers",
+      "displaySize": { "width": 64, "height": 48 },
+      "interactionRange": 70,
+      "state": "locked",
+      "initiallyUnlocked": false,
+      "unlockedBy": { "npcId": "emma", "tier": 1 },
+      "notebookNote": "Recipe with critical notes - someone had strong opinions"
+    },
+    {
+      "id": "bookshelf-hiding-spot",
+      "name": "Hidden Gap",
+      "description": "A narrow gap behind the tall bookshelf. Perfect for hiding something... or for someone to slip away unnoticed. There's a faint scent of pastry lingering here.",
+      "position": { "x": 100, "y": 350 },
+      "spriteKey": "clue-hiding-spot",
+      "displaySize": { "width": 48, "height": 64 },
+      "interactionRange": 70,
+      "state": "locked",
+      "initiallyUnlocked": false,
+      "unlockedBy": { "npcId": "luca", "tier": 2 },
+      "notebookNote": "Hidden gap behind bookshelf - smells like pastry"
+    },
+    {
+      "id": "empty-plate",
+      "name": "Spotless Plate",
+      "description": "The plate where Valentin's erdbeerstrudel was displayed. It's completely clean... suspiciously clean. Not a single crumb remains, as if someone deliberately wiped it down.",
+      "position": { "x": 1000, "y": 400 },
+      "spriteKey": "clue-plate",
+      "displaySize": { "width": 48, "height": 48 },
+      "interactionRange": 60,
+      "state": "locked",
+      "initiallyUnlocked": false,
+      "unlockedBy": { "npcId": "sebastian", "tier": 1 },
+      "notebookNote": "Suspiciously clean plate - too thorough for an accident"
+    }
+  ]
+}

@@ -7,6 +7,8 @@ import { DialogManager } from '../systems/dialog-manager';
 import { InteractionDetector } from '../systems/interaction-detector';
 import { NotebookManager } from '../systems/notebook-manager';
 import { NotebookUI } from '../components/notebook-ui';
+import { GameProgressionManager } from '../systems/game-progression-manager';
+import { ClueTracker } from '../systems/clue-tracker';
 import type {
   LibraryLayoutConfig,
   FurnitureConfig,
@@ -48,6 +50,10 @@ export class LibraryScene extends Phaser.Scene {
   private notebookManager!: NotebookManager;
   private notebookUI!: NotebookUI;
   private notebookKey!: Phaser.Input.Keyboard.Key;
+  
+  // Progression system
+  private progressionManager!: GameProgressionManager;
+  private clueTracker!: ClueTracker;
 
   constructor() {
     super({ key: 'library-scene' });
@@ -59,17 +65,22 @@ export class LibraryScene extends Phaser.Scene {
   preload(): void {
     // Register error handler for graceful degradation
     this.load.on('loaderror', (file: any) => {
-      console.warn(`Asset load failed: ${file.key}`);
-      this.assetErrors.set(file.key, true);
+      console.error('Failed to load asset:', file.key);
     });
-
+    
     // Load layout configuration
     this.load.json('library-layout', 'src/data/library-layout.json');
+    
+    // Load progression data files
+    this.load.json('progression-config', 'src/data/progression.json');
+    this.load.json('clues-data', 'src/data/clues.json');
 
     // Load character metadata for dialog system
     const characterNames = ['klaus', 'valentin', 'sebastian', 'marianne', 'emma', 'luca'];
     characterNames.forEach(charName => {
       this.load.json(`${charName}-metadata`, `assets/sprites/characters/${charName}/metadata.json`);
+      // Load character dialog data
+      this.load.json(`dialog-${charName}`, `src/data/dialogs/${charName}.json`);
     });
 
     // Load Klaus character animations and idle sprites
@@ -165,11 +176,20 @@ export class LibraryScene extends Phaser.Scene {
     this.cameras.main.setZoom(1.0);
     this.cameras.main.setRoundPixels(true); // Pixel-perfect rendering
 
+    // Initialize progression system FIRST (before dialog system)
+    this.initializeProgressionSystem();
+
     // Initialize dialog system
     this.initializeDialogSystem();
 
     // Initialize notebook system
     this.initializeNotebookSystem();
+    
+    // Link all systems together
+    this.linkSystems();
+    
+    // Setup progression event listeners
+    this.setupProgressionEvents();
 
     // Create debug text overlay
     this.debugText = this.add.text(10, 10, '', {
@@ -224,6 +244,11 @@ export class LibraryScene extends Phaser.Scene {
     
     // Update all NPCs
     this.npcs.forEach(npc => npc.update(delta));
+
+    // Update progression systems
+    if (this.clueTracker) {
+      this.clueTracker.update(delta);
+    }
 
     // Update dialog system
     this.updateDialogSystem();
@@ -716,6 +741,143 @@ export class LibraryScene extends Phaser.Scene {
     });
 
     console.log('✓ Notebook system initialized');
+  }
+  
+  /**
+   * Initialize progression system (game phases, clue tracking)
+   */
+  private initializeProgressionSystem(): void {
+    // Create GameProgressionManager
+    this.progressionManager = new GameProgressionManager({
+      scene: this,
+      registryKey: 'progressionManager',
+      storageKey: 'erdbeerstrudel-progression',
+      saveDebounceMs: 2000,
+    });
+    this.progressionManager.initialize();
+
+    // Create ClueTracker
+    this.clueTracker = new ClueTracker({
+      scene: this,
+      registryKey: 'clueTracker',
+    });
+    this.clueTracker.initialize();
+
+    console.log('✓ Progression system initialized');
+  }
+  
+  /**
+   * Link all systems together with necessary references
+   */
+  private linkSystems(): void {
+    // Link progression manager to dialog manager
+    this.dialogManager.setProgressionManager(this.progressionManager);
+    this.dialogManager.loadCharacterDialogs();
+
+    // Link clue tracker to notebook manager
+    this.clueTracker.on('clue-discovered', (data: { clueId: string; clue: any }) => {
+      this.notebookManager.addEntry({
+        id: `clue-${Date.now()}`,
+        category: 'clue',
+        sourceId: data.clueId,
+        sourceName: data.clue.name,
+        text: data.clue.notebookNote,
+        timestamp: Date.now(),
+      });
+    });
+
+    console.log('✓ All systems linked');
+  }
+  
+  /**
+   * Setup progression event listeners
+   */
+  private setupProgressionEvents(): void {
+    // Listen for dialog-closed to mark NPC introduced
+    this.events.on('dialog-closed', (data: { sourceId?: string }) => {
+      if (data.sourceId) {
+        this.progressionManager.markNPCIntroduced(data.sourceId);
+      }
+    });
+
+    // Listen for incident trigger
+    this.progressionManager.on('incident-triggered', () => {
+      this.playIncidentCutscene();
+    });
+
+    // Listen for phase changes
+    this.progressionManager.on('phase-changed', (data: { previousPhase: string; phase: string }) => {
+      console.log(`📖 Phase changed: ${data.previousPhase} → ${data.phase}`);
+      
+      if (data.phase === 'post-incident') {
+        // Unlock initially available clues
+        this.clueTracker.getAllClues().forEach(clue => {
+          if (clue.initiallyUnlocked) {
+            this.clueTracker.unlockClue(clue.id);
+          }
+        });
+      }
+    });
+
+    console.log('✓ Progression events setup');
+  }
+  
+  /**
+   * Play the incident cutscene (Valentin's return)
+   */
+  private playIncidentCutscene(): void {
+    const config = this.progressionManager.getConfig();
+    if (!config) return;
+
+    const cutscene = config.incidentCutscene;
+
+    // Lock player movement
+    this.player.lockMovement();
+
+    // Find Valentin and move him to entry position
+    const valentin = this.npcs.find(npc => npc.id === 'valentin');
+    if (valentin) {
+      valentin.setPosition(cutscene.entryPosition.x, cutscene.entryPosition.y);
+      if (typeof valentin.pauseMovement === 'function') {
+        valentin.pauseMovement();
+      }
+    }
+
+    // Show Valentin's speech
+    this.dialogBox.show({
+      speaker: 'Valentin',
+      message: cutscene.speechLines.join('\n\n'),
+      type: 'npc',
+      characterId: 'valentin',
+      objectId: null,
+      recordInNotebook: true,
+      notebookNote: "Valentin's erdbeerstrudel has been eaten! He's locked the door!",
+    });
+
+    // Record incident in notebook
+    this.notebookManager.addEntry({
+      id: `incident-${Date.now()}`,
+      category: 'clue',
+      sourceId: 'incident',
+      sourceName: 'The Incident',
+      text: "Someone ate Valentin's erdbeerstrudel! The door is locked and no one can leave.",
+      timestamp: Date.now(),
+    });
+
+    // After cutscene duration, unlock movement
+    this.time.delayedCall(cutscene.durationMs, () => {
+      this.dialogBox.hide();
+      this.player.unlockMovement();
+      
+      if (valentin && typeof valentin.resumeMovement === 'function') {
+        valentin.resumeMovement();
+      }
+      
+      // Visual indicator: lock the door (simplified - just log for now)
+      console.log('🚪 Door locked at', cutscene.doorPosition);
+    });
+
+    console.log('🎬 Incident cutscene playing');
   }
 
   /**

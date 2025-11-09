@@ -1,7 +1,10 @@
 import Phaser from 'phaser';
-import type { DialogManagerConfig, DialogMessage, DialogData } from '../types/dialog';
+import type { DialogManagerConfig, DialogMessage, DialogData, DialogTier } from '../types/dialog';
 import type { DialogBox } from '../components/dialog-box';
 import type { NotebookManager } from './notebook-manager';
+import type { GameProgressionManager } from './game-progression-manager';
+import type { CharacterDialogData, GamePhase } from '../types/progression';
+import { validateCharacterDialogData, logValidationResult } from '../utils/validation';
 
 /**
  * DialogManager system - Manages dialog state and flow
@@ -21,6 +24,10 @@ export class DialogManager {
   private maxHistorySize: number;
   private activeEntity: any | null = null; // The entity currently in conversation
   private notebookManager: NotebookManager | null = null;
+  private progressionManager: GameProgressionManager | null = null;
+  private dialogCache: Map<string, CharacterDialogData> = new Map();
+  private currentNPCId: string | null = null;
+  private currentTier: number = 0;
   private keys: {
     interact: Phaser.Input.Keyboard.Key[];
     close: Phaser.Input.Keyboard.Key;
@@ -55,6 +62,43 @@ export class DialogManager {
   }
 
   /**
+   * Set the progression manager for phase-based dialog selection
+   */
+  public setProgressionManager(manager: GameProgressionManager): void {
+    this.progressionManager = manager;
+  }
+
+  /**
+   * Load character dialog data from JSON files
+   */
+  public loadCharacterDialogs(): void {
+    const characters = ['valentin', 'emma', 'klaus', 'luca', 'marianne', 'sebastian'];
+    
+    characters.forEach(id => {
+      try {
+        const data = this.scene.cache.json.get(`dialog-${id}`);
+        if (!data) {
+          console.warn(`Dialog data not found for ${id}`);
+          return;
+        }
+
+        const validationResult = validateCharacterDialogData(data, id);
+        logValidationResult(`dialog-${id}.json`, validationResult);
+
+        if (validationResult.valid) {
+          this.dialogCache.set(id, data as CharacterDialogData);
+        } else {
+          console.error(`Failed to load dialog for ${id}:`, validationResult.errors);
+        }
+      } catch (error) {
+        console.error(`Error loading dialog for ${id}:`, error);
+      }
+    });
+
+    console.log(`✓ Loaded dialog data for ${this.dialogCache.size} characters`);
+  }
+
+  /**
    * Open dialog with content from an entity
    */
   public open(
@@ -68,7 +112,20 @@ export class DialogManager {
       return;
     }
 
-    const message = this.createMessage(dialogData, sourceType, sourceId, speakerName);
+    // Use phase-based selection for NPCs if progression manager available
+    let messageData = dialogData;
+    if (sourceType === 'npc' && this.progressionManager) {
+      const phase = this.progressionManager.getCurrentPhase();
+      const tier = this.progressionManager.getDialogTier();
+      messageData = this.selectDialog(sourceId, phase, tier);
+      this.currentNPCId = sourceId;
+      this.currentTier = tier;
+      
+      // Record conversation for follow-up tracking
+      this.progressionManager.recordConversation(sourceId, tier);
+    }
+
+    const message = this.createMessage(messageData, sourceType, sourceId, speakerName);
     this.dialogBox.show(message);
     this.lockPlayerMovement();
     this.addToHistory(message);
@@ -98,6 +155,16 @@ export class DialogManager {
       return;
     }
 
+    // Handle post-dialog actions (clue unlocking)
+    if (this.currentNPCId && this.progressionManager) {
+      this.handlePostDialogActions(this.currentNPCId, this.currentTier);
+    }
+
+    // Emit dialog-closed event for progression tracking
+    if (this.currentNPCId) {
+      this.scene.events.emit('dialog-closed', { sourceId: this.currentNPCId });
+    }
+
     this.dialogBox.hide();
     this.unlockPlayerMovement();
 
@@ -105,7 +172,10 @@ export class DialogManager {
     if (this.activeEntity && typeof this.activeEntity.resumeMovement === 'function') {
       this.activeEntity.resumeMovement();
     }
+    
     this.activeEntity = null;
+    this.currentNPCId = null;
+    this.currentTier = 0;
   }
 
   /**
@@ -120,8 +190,15 @@ export class DialogManager {
    */
   public handleInput(): void {
     if (this.isOpen()) {
-      // Check for close keys
-      if (this.isCloseKeyPressed() || this.isInteractKeyPressed()) {
+      // Check for interact keys (advance page or close)
+      if (this.isInteractKeyPressed()) {
+        // Try to advance to next page
+        if (!this.dialogBox.nextPage()) {
+          // No more pages, close the dialog
+          this.close();
+        }
+      } else if (this.isCloseKeyPressed()) {
+        // ESC always closes immediately
         this.close();
       }
     }
@@ -152,7 +229,10 @@ export class DialogManager {
   ): DialogMessage {
     let message: string;
 
-    if (sourceType === 'npc' && dialogData.introduction) {
+    // Handle new lines array format (for phase-based system)
+    if (dialogData.lines && dialogData.lines.length > 0) {
+      message = dialogData.lines.join('\n\n');
+    } else if (sourceType === 'npc' && dialogData.introduction) {
       message = dialogData.introduction;
     } else if (sourceType === 'object' && dialogData.description) {
       message = dialogData.description;
@@ -219,9 +299,84 @@ export class DialogManager {
   }
 
   /**
+   * Select appropriate dialog content based on phase and tier
+   */
+  private selectDialog(characterId: string, phase: GamePhase, tier: number): DialogData {
+    const charData = this.dialogCache.get(characterId);
+    if (!charData) {
+      console.warn(`No dialog data for character: ${characterId}`);
+      return this.fallbackDialog();
+    }
+
+    if (phase === 'pre-incident') {
+      // Return introduction dialog
+      return {
+        lines: charData.introduction.lines,
+        recordInNotebook: charData.introduction.recordInNotebook,
+        notebookNote: charData.introduction.notebookNote,
+      };
+    } else {
+      // Post-incident: select tier
+      if (!charData.postIncident || tier >= charData.postIncident.length) {
+        console.warn(`No tier ${tier} dialog for ${characterId}`);
+        return this.fallbackDialog();
+      }
+
+      const tierData = charData.postIncident[tier];
+      const conversationCount = this.progressionManager?.getConversationCount(characterId, tier) ?? 0;
+
+      // First conversation at this tier: use initial lines
+      if (conversationCount === 0) {
+        return {
+          lines: tierData.lines,
+          recordInNotebook: tierData.recordInNotebook,
+          notebookNote: tierData.notebookNote,
+        };
+      } else {
+        // Follow-up conversation: cycle through follow-up lines
+        const index = (conversationCount - 1) % tierData.followUpLines.length;
+        return {
+          lines: [tierData.followUpLines[index]],
+          recordInNotebook: false, // Don't record follow-ups
+        };
+      }
+    }
+  }
+
+  /**
+   * Fallback dialog when data is missing
+   */
+  private fallbackDialog(): DialogData {
+    return {
+      lines: ['...'],
+      recordInNotebook: false,
+    };
+  }
+
+  /**
+   * Handle post-dialog actions (clue unlocking)
+   */
+  private handlePostDialogActions(characterId: string, tier: number): void {
+    const charData = this.dialogCache.get(characterId);
+    if (!charData || !charData.postIncident) return;
+
+    const tierData = charData.postIncident[tier];
+    if (!tierData || !tierData.unlocksClues || tierData.unlocksClues.length === 0) {
+      return;
+    }
+
+    // Emit clue unlock events
+    tierData.unlocksClues.forEach(clueId => {
+      console.log(`Dialog unlocking clue: ${clueId}`);
+      this.scene.events.emit('clue-unlock-requested', clueId);
+    });
+  }
+
+  /**
    * Destroy and clean up
    */
   public destroy(): void {
     this.dialogHistory = [];
+    this.dialogCache.clear();
   }
 }

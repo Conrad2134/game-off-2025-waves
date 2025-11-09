@@ -1,0 +1,79 @@
+{
+  "characterId": "sebastian",
+  "characterName": "Sebastian",
+  "introduction": {
+    "lines": [
+      "Good evening. Sebastian. Charmed, I'm sure.",
+      "Valentin has impeccable taste in both literature and pastries.",
+      "His erdbeerstrudel is legendary. I've been looking forward to this."
+    ],
+    "recordInNotebook": true,
+    "notebookNote": "Sebastian is refined and cultured. Appreciates Valentin's taste in food and books."
+  },
+  "postIncident": [
+    {
+      "tier": 0,
+      "requiredClues": 0,
+      "lines": [
+        "This is quite the predicament. Most unseemly.",
+        "I was perusing Valentin's first editions during the... incident.",
+        "I assure you, I saw nothing out of the ordinary."
+      ],
+      "followUpLines": [
+        "I find this entire situation distasteful.",
+        "Surely we can resolve this like civilized people?",
+        "I have other engagements tonight..."
+      ],
+      "recordInNotebook": false
+    },
+    {
+      "tier": 1,
+      "requiredClues": 1,
+      "lines": [
+        "You're investigating? How... industrious.",
+        "If you must know, I did notice the plate at one point.",
+        "It was oddly pristine, as if someone had cleaned it deliberately."
+      ],
+      "followUpLines": [
+        "Perhaps that detail is relevant?",
+        "I'm merely trying to assist.",
+        "The sooner this is over, the better."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Sebastian noticed the plate was unusually clean. Why mention this specifically?",
+      "unlocksClues": ["empty-plate"]
+    },
+    {
+      "tier": 2,
+      "requiredClues": 3,
+      "lines": [
+        "You're making remarkable progress.",
+        "I suppose I should contribute more information.",
+        "I saw Emma lingering near the dessert area. She seemed quite... interested in the strudel."
+      ],
+      "followUpLines": [
+        "Take that information as you will.",
+        "I'm merely reporting what I observed.",
+        "Everyone here has been acting suspiciously, if you ask me."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Sebastian claims Emma was very interested in the strudel. Everyone's pointing fingers..."
+    },
+    {
+      "tier": 3,
+      "requiredClues": 5,
+      "lines": [
+        "I see you've been exceptionally thorough.",
+        "Very well. Complete transparency, then.",
+        "I did sample the strudel. More than a sample, actually. But I left some! I'm certain of it."
+      ],
+      "followUpLines": [
+        "It was simply too tempting to resist.",
+        "But I'm not solely responsible for its disappearance.",
+        "Several people took pieces. This is a collective guilt, not individual."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Sebastian admits to eating 'more than a sample' but insists others did too. Shared guilt?"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "characterId": "klaus",
+  "characterName": "Klaus",
+  "introduction": {
+    "lines": [
+      "Greetings! Klaus here. Pleasure to make your acquaintance.",
+      "Valentin and I go way back - we studied together at university.",
+      "He's been perfecting that erdbeerstrudel recipe for years!"
+    ],
+    "recordInNotebook": true,
+    "notebookNote": "Klaus is an old friend of Valentin's from university. Knows about the strudel recipe history."
+  },
+  "postIncident": [
+    {
+      "tier": 0,
+      "requiredClues": 0,
+      "lines": [
+        "I can't believe this happened! Poor Valentin...",
+        "I was admiring his book collection when the strudel went missing.",
+        "This is absolutely outrageous. We need to find the culprit!"
+      ],
+      "followUpLines": [
+        "Have you made any progress?",
+        "As Valentin's friend, I want justice!",
+        "Someone here is lying, I'm sure of it."
+      ],
+      "recordInNotebook": false
+    },
+    {
+      "tier": 1,
+      "requiredClues": 1,
+      "lines": [
+        "You're investigating? Good, good.",
+        "I must confess, Valentin's recipes haven't always been... perfect.",
+        "We used to critique each other's cooking back in university. Sometimes quite harshly."
+      ],
+      "followUpLines": [
+        "But that was years ago! I'd never sabotage his work now.",
+        "We've moved past those petty competitions.",
+        "...Haven't we?"
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Klaus and Valentin used to critique each other's cooking harshly. Old rivalry?"
+    },
+    {
+      "tier": 2,
+      "requiredClues": 3,
+      "lines": [
+        "You're proving quite thorough in your investigation.",
+        "I respect that. Truth should always come to light.",
+        "Between you and me, I think Sebastian was acting strangely earlier. Very nervous."
+      ],
+      "followUpLines": [
+        "Just an observation, mind you.",
+        "I'm not one to spread rumors without evidence.",
+        "But you might want to press him a bit harder."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Klaus thinks Sebastian was acting nervous. Genuine observation or misdirection?"
+    },
+    {
+      "tier": 3,
+      "requiredClues": 5,
+      "lines": [
+        "You've uncovered everything, haven't you?",
+        "I suppose I should be honest now.",
+        "I did taste a small piece when Valentin wasn't looking. But I didn't eat the whole thing! Someone else must have finished it."
+      ],
+      "followUpLines": [
+        "It was just a tiny sample! For old time's sake.",
+        "You believe me, don't you?",
+        "I know how it looks, but I'm not the main culprit here."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Klaus admits to tasting the strudel but denies eating all of it. Partial truth?"
+    }
+  ]
+}

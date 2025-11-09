@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "phases": {
+    "pre-incident": {
+      "name": "The Party",
+      "cluesEnabled": false,
+      "notebookEnabled": true
+    },
+    "post-incident": {
+      "name": "The Investigation",
+      "cluesEnabled": true,
+      "notebookEnabled": true
+    }
+  },
+  "incidentTrigger": {
+    "requiresNPCsIntroduced": ["emma", "luca", "marianne", "sebastian", "valentin"],
+    "delayMs": 2000
+  },
+  "incidentCutscene": {
+    "entryPosition": { "x": 600, "y": 100 },
+    "speechLines": [
+      "My erdbeerstrudel! It's gone!",
+      "I worked all morning on it... and now someone has eaten it!",
+      "No one is leaving this library until I find out who did this!"
+    ],
+    "doorPosition": { "x": 600, "y": 750 },
+    "durationMs": 8000
+  }
+}

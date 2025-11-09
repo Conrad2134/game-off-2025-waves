@@ -89,6 +89,51 @@ export interface DialogData {
   
   /** Future: Branching conversation trees */
   conversations?: Record<string, ConversationNode>;
+  
+  /** Dialog lines (for phase-based system) */
+  lines?: string[];
+}
+
+/**
+ * Extended DialogData for phase-based progression system
+ * Supports multi-tier dialog selection based on game progress
+ */
+export interface PhaseBasedDialogData extends DialogData {
+  /** Introduction dialog (pre-incident phase) */
+  introduction?: {
+    lines: string[];
+    recordInNotebook: boolean;
+    notebookNote?: string;
+  };
+  
+  /** Post-incident dialog tiers */
+  postIncident?: DialogTier[];
+}
+
+/**
+ * Dialog tier for phase-based NPC conversations
+ */
+export interface DialogTier {
+  /** Tier identifier (0-3) */
+  tier: number;
+  
+  /** Minimum clues required to unlock this tier */
+  requiredClues: number;
+  
+  /** Dialog lines for first conversation at this tier */
+  lines: string[];
+  
+  /** Dialog lines for repeated conversations at this tier */
+  followUpLines: string[];
+  
+  /** Whether this dialog should be recorded in notebook */
+  recordInNotebook: boolean;
+  
+  /** Summarized note for notebook (if recordInNotebook is true) */
+  notebookNote?: string;
+  
+  /** Clue IDs unlocked after this conversation completes */
+  unlocksClues?: string[];
 }
 
 /**

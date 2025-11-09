@@ -1,0 +1,79 @@
+{
+  "characterId": "luca",
+  "characterName": "Luca",
+  "introduction": {
+    "lines": [
+      "Hey there! I'm Luca. Nice party, right?",
+      "I only met Valentin recently through mutual friends.",
+      "But man, everyone talks about his erdbeerstrudel! Can't wait to try it."
+    ],
+    "recordInNotebook": true,
+    "notebookNote": "Luca is relatively new to the group. Excited about trying the famous strudel."
+  },
+  "postIncident": [
+    {
+      "tier": 0,
+      "requiredClues": 0,
+      "lines": [
+        "Whoa, this is intense! Someone actually ate it?",
+        "I barely know anyone here, so it definitely wasn't me.",
+        "I was checking out the books on the far wall. Didn't see anything."
+      ],
+      "followUpLines": [
+        "This is wild. My first party here and this happens?",
+        "I hope you find who did it. I don't want to be suspected!",
+        "Being the new person makes me look suspicious, doesn't it?"
+      ],
+      "recordInNotebook": false
+    },
+    {
+      "tier": 1,
+      "requiredClues": 1,
+      "lines": [
+        "You found a clue? That's something at least.",
+        "Look, I know I'm the new guy, but I swear I didn't do it.",
+        "Although... I did notice something odd behind the bookshelf earlier. Might be worth checking out?"
+      ],
+      "followUpLines": [
+        "Did you check behind the bookshelf?",
+        "I'm just trying to be helpful here!",
+        "Please believe me, I'm not the culprit."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Luca is defensive about being new. Mentioned something behind the bookshelf."
+    },
+    {
+      "tier": 2,
+      "requiredClues": 3,
+      "lines": [
+        "Wow, you're really solving this mystery!",
+        "Okay, I'll be completely honest now.",
+        "I saw Marianne near the dessert table right before Valentin left. She was acting kind of nervous."
+      ],
+      "followUpLines": [
+        "I probably should have mentioned that earlier...",
+        "But I didn't want to throw anyone under the bus without proof.",
+        "Go ahead and check behind that bookshelf like I mentioned."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Luca saw Marianne near the dessert table looking nervous. Why wait to mention this?",
+      "unlocksClues": ["bookshelf-hiding-spot"]
+    },
+    {
+      "tier": 3,
+      "requiredClues": 5,
+      "lines": [
+        "Alright, you got me. I'll come clean.",
+        "I did eat a little bit of the strudel. Just a taste!",
+        "But when I came back later, the whole thing was gone. Someone else finished it after me!"
+      ],
+      "followUpLines": [
+        "I know I shouldn't have taken that first bite...",
+        "But I was curious! Everyone hyped it up so much!",
+        "I'm sorry, okay? But I'm not the only guilty one here."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Luca admits to taking 'just a taste' but claims someone else finished it. Believable?"
+    }
+  ]
+}

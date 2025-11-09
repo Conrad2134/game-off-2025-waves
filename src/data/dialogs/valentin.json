@@ -1,0 +1,78 @@
+{
+  "characterId": "valentin",
+  "characterName": "Valentin",
+  "introduction": {
+    "lines": [
+      "Welcome, welcome! I'm so glad you could make it to my gathering.",
+      "I've prepared my famous erdbeerstrudel for everyone - it's cooling in the kitchen.",
+      "Please, make yourself at home. I'll go fetch the strudel shortly!"
+    ],
+    "recordInNotebook": true,
+    "notebookNote": "Valentin is hosting the party. He made his famous erdbeerstrudel."
+  },
+  "postIncident": [
+    {
+      "tier": 0,
+      "requiredClues": 0,
+      "lines": [
+        "My erdbeerstrudel! Someone ate it!",
+        "I won't let anyone leave until I find out who did this!",
+        "Please, help me investigate. Look around for any clues."
+      ],
+      "followUpLines": [
+        "Have you found anything yet?",
+        "Someone in this room is guilty, I'm certain of it.",
+        "Please, keep searching. There must be evidence somewhere."
+      ],
+      "recordInNotebook": false
+    },
+    {
+      "tier": 1,
+      "requiredClues": 1,
+      "lines": [
+        "You found something? Let me see...",
+        "Interesting... This could be important.",
+        "Keep investigating. Every clue brings us closer to the truth."
+      ],
+      "followUpLines": [
+        "Any new discoveries?",
+        "The evidence is mounting...",
+        "Have you talked to everyone? Someone knows more than they're saying."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Valentin is genuinely upset about the missing strudel. He's counting on me to find the culprit."
+    },
+    {
+      "tier": 2,
+      "requiredClues": 3,
+      "lines": [
+        "Three clues already? You're quite the detective!",
+        "I remember seeing someone near that napkin earlier...",
+        "But I can't quite place who it was. Maybe if you find more evidence?"
+      ],
+      "followUpLines": [
+        "The pieces are coming together, aren't they?",
+        "Someone's story doesn't add up. I can feel it.",
+        "Keep pressing. The truth will reveal itself."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Valentin saw someone near the napkin but can't remember who. His memory seems selective."
+    },
+    {
+      "tier": 3,
+      "requiredClues": 5,
+      "lines": [
+        "Five clues! You've been thorough.",
+        "I... I think I know who did it now.",
+        "But I want to hear your conclusion first. Who do you believe ate my erdbeerstrudel?"
+      ],
+      "followUpLines": [
+        "Take your time. Review all the evidence.",
+        "When you're ready, make your accusation.",
+        "Choose carefully. There's only one guilty party here."
+      ],
+      "recordInNotebook": true,
+      "notebookNote": "Valentin claims to know the culprit but wants me to solve it myself. Testing me?"
+    }
+  ]
+}
