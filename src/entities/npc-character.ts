@@ -104,12 +104,20 @@ export class NPCCharacter extends Phaser.GameObjects.Container implements Intera
   public update(delta: number): void {
     // Skip update if paused (e.g., during dialog)
     if (this.isPaused) {
+      // Debug: Log paused state for Valentin
+      if (this.characterName === 'valentin' && Math.random() < 0.01) {
+        console.log(`[${this.characterName}] Still paused, not updating`);
+      }
       return;
     }
 
     const body = this.body as Phaser.Physics.Arcade.Body;
 
     if (this.isMoving && this.targetPosition) {
+      // Log first frame of movement
+      if (Math.random() < 0.005) { // 0.5% chance to reduce spam
+        console.log(`[${this.characterName}] Moving to (${Math.round(this.targetPosition.x)}, ${Math.round(this.targetPosition.y)}), currently at (${Math.round(this.x)}, ${Math.round(this.y)})`);
+      }
       // Check if we've reached the target
       const distance = Phaser.Math.Distance.Between(
         this.x,
@@ -301,8 +309,37 @@ export class NPCCharacter extends Phaser.GameObjects.Container implements Intera
    */
   public setHomePosition(x: number, y: number): void {
     this.homePosition = { x, y };
-    // Optionally move the NPC to the new home position
-    this.setPosition(x, y);
+    // Note: Does NOT move the NPC, just sets the wander center
+  }
+
+  /**
+   * Walk to a specific position (scripted movement)
+   * @param x Target x position
+   * @param y Target y position
+   * @param onComplete Optional callback when destination is reached
+   */
+  public walkToPosition(x: number, y: number, onComplete?: () => void): void {
+    // CRITICAL: Unpause for scripted movement
+    this.isPaused = false;
+    
+    this.targetPosition = { x, y };
+    this.isMoving = true;
+    this.moveTimer = 10000; // 10 second timeout for scripted movement
+    
+    console.log(`[${this.characterName}] Walking to (${x}, ${y}) from (${Math.round(this.x)}, ${Math.round(this.y)})`);
+    
+    // Store callback if provided
+    if (onComplete) {
+      const checkArrival = () => {
+        if (!this.isMoving) {
+          // Arrived at destination
+          this.scene.events.off('update', checkArrival);
+          console.log(`[${this.characterName}] Arrived at destination`);
+          onComplete();
+        }
+      };
+      this.scene.events.on('update', checkArrival);
+    }
   }
 
   /**

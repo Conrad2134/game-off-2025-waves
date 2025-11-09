@@ -219,4 +219,35 @@ export class PlayerCharacter extends Phaser.GameObjects.Container {
   public setSpeed(speed: number): void {
     this.speed = speed;
   }
+
+  /**
+   * Make player face towards a specific position
+   */
+  public faceTowards(targetX: number, targetY: number): void {
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, targetX, targetY);
+    const direction = this.getDirectionFromAngle(angle);
+    this.currentDirection = direction;
+    
+    // Update sprite to idle frame in that direction
+    const idleKey = `klaus-idle-${direction}`;
+    if (this.scene.textures.exists(idleKey)) {
+      this.sprite.setTexture(idleKey);
+    }
+  }
+
+  /**
+   * Get the 8-directional direction string from an angle
+   */
+  private getDirectionFromAngle(angle: number): string {
+    let degrees = (angle * 180 / Math.PI + 360) % 360;
+    
+    if (degrees >= 337.5 || degrees < 22.5) return 'east';
+    if (degrees >= 22.5 && degrees < 67.5) return 'south-east';
+    if (degrees >= 67.5 && degrees < 112.5) return 'south';
+    if (degrees >= 112.5 && degrees < 157.5) return 'south-west';
+    if (degrees >= 157.5 && degrees < 202.5) return 'west';
+    if (degrees >= 202.5 && degrees < 247.5) return 'north-west';
+    if (degrees >= 247.5 && degrees < 292.5) return 'north';
+    return 'north-east';
+  }
 }

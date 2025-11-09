@@ -58,6 +58,7 @@ export class LibraryScene extends Phaser.Scene {
   // Opening scene
   private npcRoamingPositions: Map<string, { x: number; y: number }> = new Map();
   private hasPlayedOpeningScene: boolean = false;
+  private isOpeningSceneActive: boolean = false;
 
   constructor() {
     super({ key: 'library-scene' });
@@ -247,13 +248,24 @@ export class LibraryScene extends Phaser.Scene {
     const allIntroduced = this.progressionManager.areAllNPCsIntroduced();
     console.log(`[Opening Scene] All NPCs introduced: ${allIntroduced}`);
     
-    if (!this.hasPlayedOpeningScene && currentPhase === 'pre-incident' && !allIntroduced) {
-      console.log('[Opening Scene] Scheduling opening scene to play in 1 second...');
+    // ALWAYS play opening scene if not played yet and in pre-incident phase
+    // (The allIntroduced check was preventing it from playing)
+    if (!this.hasPlayedOpeningScene && currentPhase === 'pre-incident') {
+      console.log('[Opening Scene] ✅ Scheduling opening scene to play in 1 second...');
       this.time.delayedCall(1000, () => {
         this.playOpeningScene();
       });
     } else {
-      console.log('[Opening Scene] Skipping - already played or not first time');
+      console.log(`[Opening Scene] ❌ Skipping - hasPlayedOpeningScene: ${this.hasPlayedOpeningScene}, phase: ${currentPhase}`);
+      // If we skip the opening scene, unpause all NPCs so they can roam
+      if (this.hasPlayedOpeningScene || currentPhase !== 'pre-incident') {
+        console.log('[Opening Scene] Unpausing all NPCs for normal gameplay');
+        this.npcs.forEach(npc => {
+          if (typeof npc.resumeMovement === 'function') {
+            npc.resumeMovement();
+          }
+        });
+      }
     }
   }
 
@@ -970,19 +982,36 @@ export class LibraryScene extends Phaser.Scene {
     // Handle opening scene dialog manually (bypasses dialog manager)
     if (this.dialogBox.isVisible() && !this.dialogManager.isOpen()) {
       // This is the opening scene dialog
-      if (Phaser.Input.Keyboard.JustDown(this.interactKey) || 
-          Phaser.Input.Keyboard.JustDown(this.enterKey)) {
-        if (!this.dialogBox.nextPage()) {
+      const spacePressed = Phaser.Input.Keyboard.JustDown(this.interactKey);
+      const enterPressed = Phaser.Input.Keyboard.JustDown(this.enterKey);
+      
+      if (spacePressed || enterPressed) {
+        console.log('[Opening Scene] ⌨️  Player pressed key - Space:', spacePressed, 'Enter:', enterPressed);
+        console.log('[Opening Scene] isOpeningSceneActive:', this.isOpeningSceneActive);
+        console.log('[Opening Scene] dialogBox.isVisible():', this.dialogBox.isVisible());
+        console.log('[Opening Scene] dialogManager.isOpen():', this.dialogManager.isOpen());
+        
+        // Check if there are more pages BEFORE advancing
+        const hasMorePages = this.dialogBox.hasNextPage();
+        console.log('[Opening Scene] hasMorePages:', hasMorePages);
+        
+        if (hasMorePages) {
+          // Advance to next page
+          this.dialogBox.nextPage();
+          console.log('[Opening Scene] Advanced to next page');
+        } else {
           // No more pages, close the dialog and trigger scene progression
+          console.log('[Opening Scene] 🎬 Dialog finished - emitting opening-dialog-closed');
           this.dialogBox.hide();
-          this.events.emit('dialog-closed');
+          this.events.emit('opening-dialog-closed');
         }
       }
       return; // Skip normal dialog handling
     }
 
     // Handle interaction trigger (open dialog) - check this FIRST before handleInput consumes the key
-    if (!this.dialogManager.isOpen() && this.interactionDetector.canInteract()) {
+    // BUT skip if opening scene is active
+    if (!this.dialogManager.isOpen() && !this.isOpeningSceneActive && this.interactionDetector.canInteract()) {
       if (Phaser.Input.Keyboard.JustDown(this.interactKey) || 
           Phaser.Input.Keyboard.JustDown(this.enterKey)) {
         const entity = this.interactionDetector.getClosestInteractable();
@@ -1036,6 +1065,7 @@ export class LibraryScene extends Phaser.Scene {
    */
   private playOpeningScene(): void {
     this.hasPlayedOpeningScene = true;
+    this.isOpeningSceneActive = true;
     console.log('🎬 Playing opening scene');
 
     // Lock player movement
@@ -1067,8 +1097,9 @@ export class LibraryScene extends Phaser.Scene {
     });
 
     // Player also faces Valentin
-    // TODO: Make player face Valentin with proper direction calculation
-    // For now, player just stays in current position/direction
+    if (typeof this.player.faceTowards === 'function') {
+      this.player.faceTowards(valentin.x, valentin.y);
+    }
 
     // Show Valentin's introduction directly using dialogBox
     // Bypass dialog manager's phase system for opening cutscene
@@ -1097,66 +1128,115 @@ export class LibraryScene extends Phaser.Scene {
       });
     }
 
-    // Listen for dialog close to trigger Valentin leaving
-    const onDialogClosed = () => {
-      this.events.off('dialog-closed', onDialogClosed);
+    // Listen for dialog close to trigger Valentin leaving immediately
+    console.log('[Opening Scene] Setting up opening-dialog-closed listener');
+    this.events.once('opening-dialog-closed', () => {
+      console.log('[Opening Scene] ✅ opening-dialog-closed event fired!');
+      console.log('[Opening Scene] Dialog closed - Valentin leaving now!');
       this.valentinLeavesScene();
-    };
-    this.events.once('dialog-closed', onDialogClosed);
+    });
   }
 
   /**
    * Valentin leaves the scene after his introduction
    */
   private valentinLeavesScene(): void {
-    console.log('🚶 Valentin leaving scene');
+    console.log('🚶 ===== VALENTIN LEAVING SCENE =====');
+    console.log('[Valentin] Clearing isOpeningSceneActive flag');
+    this.isOpeningSceneActive = false;
 
     const valentin = this.npcs.find(npc => npc.id === 'valentin');
+    console.log('[Valentin] Found in NPCs array:', !!valentin);
+    
     if (valentin) {
-      // Move Valentin off-screen (to kitchen area - top of screen)
+      // Make him walk off-screen (to kitchen area - top of screen)
       const targetX = 600;
       const targetY = -100; // Off screen top
 
-      // Create a tween to move Valentin
-      this.tweens.add({
-        targets: valentin,
-        x: targetX,
-        y: targetY,
-        duration: 2000,
-        ease: 'Linear',
-        onComplete: () => {
+      console.log(`[Valentin] Current position: (${Math.round(valentin.x)}, ${Math.round(valentin.y)})`);
+      console.log(`[Valentin] Target position: (${targetX}, ${targetY})`);
+      console.log(`[Valentin] walkToPosition function exists:`, typeof valentin.walkToPosition === 'function');
+      
+      if (typeof valentin.walkToPosition === 'function') {
+        console.log('[Valentin] 🚀 Calling walkToPosition...');
+        valentin.walkToPosition(targetX, targetY, () => {
           // Hide Valentin after he's off screen
+          console.log('[Valentin] 🎯 Reached destination, hiding sprite');
           valentin.setVisible(false);
-        },
+          console.log('✅ Valentin has left the scene');
+        });
+        console.log('[Valentin] walkToPosition called successfully');
+      } else {
+        console.error('[Valentin] ❌ walkToPosition function not available!');
+      }
+      
+      // Let everyone else start roaming immediately after Valentin starts walking
+      console.log('[Valentin] Scheduling endOpeningScene in 200ms...');
+      this.time.delayedCall(200, () => {
+        console.log('[Valentin] ⏰ Timer triggered - calling endOpeningScene');
+        this.endOpeningScene();
       });
-    }
-
-    // After a short delay, let everyone start roaming
-    this.time.delayedCall(2500, () => {
+    } else {
+      // If Valentin not found, just end the scene
+      console.error('❌ Valentin not found in NPCs array!');
+      console.log('[Debug] Available NPCs:', this.npcs.map(n => n.id));
       this.endOpeningScene();
-    });
+    }
+    console.log('🚶 ===== END VALENTIN LEAVING SCENE =====');
   }
 
   /**
    * End opening scene - unlock movement and let NPCs roam
    */
   private endOpeningScene(): void {
-    console.log('✅ Opening scene complete - free roam enabled');
+    console.log('✅ ===== END OPENING SCENE =====');
+    console.log(`[Opening Scene] Total NPCs: ${this.npcs.length}`);
 
     // Unlock player movement
     this.player.unlockMovement();
+    console.log('[Opening Scene] ✅ Player movement unlocked');
 
     // Resume all NPCs (except Valentin who is off-screen)
-    this.npcs.forEach(npc => {
-      if (npc.id !== 'valentin' && typeof npc.resumeMovement === 'function') {
-        // Move NPCs to their roaming positions if we stored them
+    this.npcs.forEach((npc, index) => {
+      console.log(`[Opening Scene] Processing NPC ${index + 1}/${this.npcs.length}: ${npc.id}`);
+      if (npc.id !== 'valentin') {
+        // Get roaming position for this NPC
         const roamPos = this.npcRoamingPositions.get(npc.id);
-        if (roamPos && typeof npc.setHomePosition === 'function') {
-          npc.setHomePosition(roamPos.x, roamPos.y);
+        console.log(`[${npc.id}] Roaming position:`, roamPos);
+        
+        if (roamPos) {
+          // Walk to roaming position instead of teleporting
+          console.log(`[${npc.id}] Current position: (${Math.round(npc.x)}, ${Math.round(npc.y)})`);
+          console.log(`[${npc.id}] Walking to roaming position: (${roamPos.x}, ${roamPos.y})`);
+          
+          if (typeof npc.walkToPosition === 'function') {
+            npc.walkToPosition(roamPos.x, roamPos.y, () => {
+              // Once arrived, set it as home and enable wandering
+              console.log(`[${npc.id}] ✅ Arrived at roaming position`);
+              if (typeof npc.setHomePosition === 'function') {
+                npc.setHomePosition(roamPos.x, roamPos.y);
+                console.log(`[${npc.id}] Home position set`);
+              }
+            });
+          } else {
+            console.error(`[${npc.id}] ❌ walkToPosition not available!`);
+          }
+        } else {
+          console.warn(`[${npc.id}] ⚠️  No roaming position defined!`);
         }
-        npc.resumeMovement();
+        
+        // Resume movement (wandering will be active)
+        if (typeof npc.resumeMovement === 'function') {
+          console.log(`[${npc.id}] Calling resumeMovement()`);
+          npc.resumeMovement();
+        } else {
+          console.error(`[${npc.id}] ❌ resumeMovement not available!`);
+        }
+      } else {
+        console.log(`[${npc.id}] Skipping (should be off-screen)`);
       }
     });
+    console.log('✅ ===== END OPENING SCENE COMPLETE =====');
   }
 
   /**

@@ -127,6 +127,7 @@ export class DialogManager {
 
     const message = this.createMessage(messageData, sourceType, sourceId, speakerName);
     this.dialogBox.show(message);
+    this.isDialogOpen = true; // Mark that THIS manager is controlling the dialog
     this.lockPlayerMovement();
     this.addToHistory(message);
 
@@ -166,6 +167,7 @@ export class DialogManager {
     }
 
     this.dialogBox.hide();
+    this.isDialogOpen = false; // Mark that dialog manager is no longer controlling the dialog
     this.unlockPlayerMovement();
 
     // Resume NPC movement if applicable
@@ -179,10 +181,11 @@ export class DialogManager {
   }
 
   /**
-   * Check if dialog is currently open
+   * Check if dialog is currently open BY THIS MANAGER
+   * (not just if dialog box is visible)
    */
   public isOpen(): boolean {
-    return this.dialogBox.isVisible();
+    return this.isDialogOpen;
   }
 
   /**

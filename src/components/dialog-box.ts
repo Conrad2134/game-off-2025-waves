@@ -204,11 +204,14 @@ export class DialogBox {
    * @returns true if advanced, false if already on last page
    */
   public nextPage(): boolean {
+    console.log(`[DialogBox] nextPage() called. Current page: ${this.currentPageIndex + 1}/${this.messagePages.length}`);
     if (!this.hasNextPage()) {
+      console.log(`[DialogBox] No next page available`);
       return false;
     }
     
     this.currentPageIndex++;
+    console.log(`[DialogBox] Advanced to page ${this.currentPageIndex + 1}/${this.messagePages.length}`);
     this.displayCurrentPage();
     return true;
   }
@@ -217,7 +220,9 @@ export class DialogBox {
    * Check if there's a next page
    */
   public hasNextPage(): boolean {
-    return this.currentPageIndex < this.messagePages.length - 1;
+    const hasNext = this.currentPageIndex < this.messagePages.length - 1;
+    console.log(`[DialogBox] hasNextPage(): ${hasNext} (page ${this.currentPageIndex + 1}/${this.messagePages.length})`);
+    return hasNext;
   }
 
   /**
