@@ -5223,6 +5223,8 @@
   "export_version": "1.0",
   "export_date": "2025-11-09T03:03:46.101157",
   "dialog": {
-    "introduction": "Greetings. Sebastian here. I pride myself on my observational skills. Perhaps I can assist."
+    "introduction": "Greetings. Sebastian here. I pride myself on my observational skills. Perhaps I can assist.",
+    "recordInNotebook": true,
+    "notebookNote": "Claims to have good observational skills."
   }
 }

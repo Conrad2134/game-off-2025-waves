@@ -5223,6 +5223,8 @@
   "export_version": "1.0",
   "export_date": "2025-11-09T03:03:35.404516",
   "dialog": {
-    "introduction": "Guten Tag! I am Valentin, and someone has stolen my precious Erdbeerstrudel! Can you help me find the culprit?"
+    "introduction": "Guten Tag! I am Valentin, and someone has stolen my precious Erdbeerstrudel! Can you help me find the culprit?",
+    "recordInNotebook": true,
+    "notebookNote": "The victim. His Erdbeerstrudel was stolen."
   }
 }

@@ -63,6 +63,12 @@ export interface DialogMessage {
   
   /** Object identifier (for interactables) */
   objectId: string | null;
+  
+  /** Whether this message should be recorded in the notebook */
+  recordInNotebook?: boolean;
+  
+  /** Summarized note for the notebook (if recordInNotebook is true) */
+  notebookNote?: string;
 }
 
 /**
@@ -74,6 +80,12 @@ export interface DialogData {
   
   /** Object description (for interactables) */
   description?: string;
+  
+  /** Whether this dialog should be recorded in the notebook */
+  recordInNotebook?: boolean;
+  
+  /** Summarized note for the notebook (if recordInNotebook is true) */
+  notebookNote?: string;
   
   /** Future: Branching conversation trees */
   conversations?: Record<string, ConversationNode>;

@@ -5,6 +5,8 @@ import { InteractableObject } from '../entities/interactable-object';
 import { DialogBox } from '../components/dialog-box';
 import { DialogManager } from '../systems/dialog-manager';
 import { InteractionDetector } from '../systems/interaction-detector';
+import { NotebookManager } from '../systems/notebook-manager';
+import { NotebookUI } from '../components/notebook-ui';
 import type {
   LibraryLayoutConfig,
   FurnitureConfig,
@@ -41,6 +43,11 @@ export class LibraryScene extends Phaser.Scene {
   private interactionDetector!: InteractionDetector;
   private interactKey!: Phaser.Input.Keyboard.Key;
   private enterKey!: Phaser.Input.Keyboard.Key;
+  
+  // Notebook system
+  private notebookManager!: NotebookManager;
+  private notebookUI!: NotebookUI;
+  private notebookKey!: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super({ key: 'library-scene' });
@@ -161,6 +168,9 @@ export class LibraryScene extends Phaser.Scene {
     // Initialize dialog system
     this.initializeDialogSystem();
 
+    // Initialize notebook system
+    this.initializeNotebookSystem();
+
     // Create debug text overlay
     this.debugText = this.add.text(10, 10, '', {
       fontFamily: 'monospace',
@@ -217,6 +227,9 @@ export class LibraryScene extends Phaser.Scene {
 
     // Update dialog system
     this.updateDialogSystem();
+
+    // Update notebook system
+    this.updateNotebookSystem();
 
     // Update debug text
     const closest = this.interactionDetector.getClosestInteractable();
@@ -366,6 +379,7 @@ export class LibraryScene extends Phaser.Scene {
         x: 600,
         y: 100,
         description: 'A tall bookshelf filled with old mystery novels. The books look well-read and dusty.',
+        recordInNotebook: false,
       },
       {
         id: 'dining-table',
@@ -373,6 +387,8 @@ export class LibraryScene extends Phaser.Scene {
         x: 600,
         y: 400,
         description: 'A large wooden dining table. This is where the stolen Erdbeerstrudel was last seen!',
+        recordInNotebook: true,
+        notebookNote: 'Where the strudel was last seen.',
       },
       {
         id: 'desk',
@@ -380,6 +396,8 @@ export class LibraryScene extends Phaser.Scene {
         x: 200,
         y: 300,
         description: 'A sturdy oak desk with scattered papers and an inkwell. Someone has been taking notes.',
+        recordInNotebook: true,
+        notebookNote: 'Papers and inkwell. Someone writing notes.',
       },
     ];
 
@@ -394,6 +412,13 @@ export class LibraryScene extends Phaser.Scene {
           description: config.description,
           interactionRange: 60,
         });
+        
+        // Set the recordInNotebook flag and note on the dialog data
+        obj.dialogData.recordInNotebook = config.recordInNotebook;
+        if ('notebookNote' in config) {
+          obj.dialogData.notebookNote = config.notebookNote;
+        }
+        
         obj.setDepth(5); // Above floor, below NPCs
         this.interactableObjects.push(obj);
       } catch (error) {
@@ -657,6 +682,72 @@ export class LibraryScene extends Phaser.Scene {
     this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
     console.log('✓ Dialog system initialized');
+  }
+
+  /**
+   * Initialize notebook system components
+   */
+  private initializeNotebookSystem(): void {
+    // Create notebook manager
+    this.notebookManager = new NotebookManager({
+      scene: this,
+      maxEntries: 100,
+    });
+
+    // Link notebook manager to dialog manager
+    this.dialogManager.setNotebookManager(this.notebookManager);
+
+    // Create notebook UI
+    this.notebookUI = new NotebookUI({
+      scene: this,
+      width: 800,
+      height: 600,
+      depth: 2000,
+    });
+
+    // Setup notebook key
+    this.notebookKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.N);
+
+    // Listen for notebook entry events
+    this.events.on('notebook-entry-added', () => {
+      // Update UI with latest entries
+      const sections = this.notebookManager.generateSections();
+      this.notebookUI.updateSections(sections);
+    });
+
+    console.log('✓ Notebook system initialized');
+  }
+
+  /**
+   * Update notebook system logic (called every frame)
+   */
+  private updateNotebookSystem(): void {
+    // Toggle notebook visibility with N key
+    if (Phaser.Input.Keyboard.JustDown(this.notebookKey)) {
+      // Don't open notebook if dialog is open
+      if (!this.dialogManager.isOpen()) {
+        this.notebookUI.toggle();
+        
+        // If opening, update with latest entries
+        if (this.notebookUI.isVisible()) {
+          const sections = this.notebookManager.generateSections();
+          this.notebookUI.updateSections(sections);
+        }
+      }
+    }
+
+    // Handle scrolling when notebook is open
+    if (this.notebookUI.isVisible()) {
+      const upKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+      const downKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+      
+      if (upKey.isDown) {
+        this.notebookUI.scroll(-5);
+      }
+      if (downKey.isDown) {
+        this.notebookUI.scroll(5);
+      }
+    }
   }
 
   /**

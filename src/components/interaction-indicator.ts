@@ -19,7 +19,7 @@ export class InteractionIndicator {
 
   constructor(config: InteractionIndicatorConfig) {
     this.scene = config.scene;
-    this.offsetY = config.offsetY ?? -30;
+    this.offsetY = config.offsetY ?? -20;
 
     // Try to create sprite from asset, or create a simple placeholder
     if (this.scene.textures.exists(config.spriteKey)) {

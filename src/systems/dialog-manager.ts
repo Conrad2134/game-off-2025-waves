@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { DialogManagerConfig, DialogMessage, DialogData } from '../types/dialog';
 import type { DialogBox } from '../components/dialog-box';
+import type { NotebookManager } from './notebook-manager';
 
 /**
  * DialogManager system - Manages dialog state and flow
@@ -10,6 +11,7 @@ import type { DialogBox } from '../components/dialog-box';
  * - Player movement locking during dialog
  * - Dialog history tracking
  * - Input handling for dialog interactions
+ * - Automatic notebook recording for marked dialogs
  */
 export class DialogManager {
   private scene: Phaser.Scene;
@@ -18,6 +20,7 @@ export class DialogManager {
   private dialogHistory: DialogMessage[] = [];
   private maxHistorySize: number;
   private activeEntity: any | null = null; // The entity currently in conversation
+  private notebookManager: NotebookManager | null = null;
   private keys: {
     interact: Phaser.Input.Keyboard.Key[];
     close: Phaser.Input.Keyboard.Key;
@@ -45,6 +48,13 @@ export class DialogManager {
   }
 
   /**
+   * Set the notebook manager for automatic recording
+   */
+  public setNotebookManager(notebookManager: NotebookManager): void {
+    this.notebookManager = notebookManager;
+  }
+
+  /**
    * Open dialog with content from an entity
    */
   public open(
@@ -62,6 +72,11 @@ export class DialogManager {
     this.dialogBox.show(message);
     this.lockPlayerMovement();
     this.addToHistory(message);
+
+    // Record in notebook if marked
+    if (this.notebookManager && message.recordInNotebook) {
+      this.notebookManager.recordDialog(message);
+    }
 
     // Store active entity and pause NPC movement if applicable
     this.activeEntity = entity ?? null;
@@ -152,6 +167,8 @@ export class DialogManager {
       type: sourceType,
       characterId: sourceType === 'npc' ? sourceId : null,
       objectId: sourceType === 'object' ? sourceId : null,
+      recordInNotebook: dialogData.recordInNotebook ?? false,
+      notebookNote: dialogData.notebookNote,
     };
   }
 

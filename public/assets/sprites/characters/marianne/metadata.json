@@ -5223,6 +5223,8 @@
   "export_version": "1.0",
   "export_date": "2025-11-09T03:03:53.276449",
   "dialog": {
-    "introduction": "Hello, I'm Marianne. I was organizing books when it happened. Let me know if you need anything."
+    "introduction": "Hello, I'm Marianne. I was organizing books when it happened. Let me know if you need anything.",
+    "recordInNotebook": true,
+    "notebookNote": "Was organizing books when it happened."
   }
 }
