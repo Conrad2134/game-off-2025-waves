@@ -1,0 +1,213 @@
+import Phaser from 'phaser';
+
+export interface NPCCharacterConfig {
+  scene: Phaser.Scene;
+  x: number;
+  y: number;
+  characterName: string; // e.g., 'valentin', 'sebastian'
+  speed?: number;
+  wanderRadius?: number;
+}
+
+/**
+ * NPCCharacter entity - autonomous NPC with wandering behavior
+ * 
+ * Features:
+ * - Automatic wandering within a radius
+ * - 8-directional movement and animations
+ * - Idle periods between movements
+ * - Collision detection
+ */
+export class NPCCharacter extends Phaser.GameObjects.Container {
+  private sprite: Phaser.GameObjects.Sprite;
+  private characterName: string;
+  private speed: number;
+  private wanderRadius: number;
+  private homePosition: { x: number; y: number };
+  private currentDirection: string = 'south';
+  private isMoving: boolean = false;
+  private targetPosition: { x: number; y: number } | null = null;
+  private idleTimer: number = 0;
+  private moveTimer: number = 0;
+
+  constructor(config: NPCCharacterConfig) {
+    super(config.scene, config.x, config.y);
+
+    this.characterName = config.characterName;
+    this.speed = config.speed ?? 80;
+    this.wanderRadius = config.wanderRadius ?? 200;
+    this.homePosition = { x: config.x, y: config.y };
+
+    // Create sprite
+    this.sprite = config.scene.add.sprite(0, 0, `${config.characterName}-idle-south`);
+    this.sprite.setScale(2);
+    this.add(this.sprite);
+
+    // Add to scene
+    config.scene.add.existing(this);
+
+    // Enable physics
+    config.scene.physics.add.existing(this);
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setCollideWorldBounds(true);
+    body.setSize(56, 56);
+    body.setOffset(-28, -28);
+    body.setImmovable(true); // NPCs can't be pushed
+
+    // Start with a random idle period
+    this.idleTimer = Phaser.Math.Between(1000, 3000);
+  }
+
+  /**
+   * Update NPC behavior - wandering AI
+   */
+  public update(delta: number): void {
+    const body = this.body as Phaser.Physics.Arcade.Body;
+
+    if (this.isMoving && this.targetPosition) {
+      // Check if we've reached the target
+      const distance = Phaser.Math.Distance.Between(
+        this.x,
+        this.y,
+        this.targetPosition.x,
+        this.targetPosition.y
+      );
+
+      if (distance < 5) {
+        // Reached target, stop and idle
+        this.stopMoving();
+        this.idleTimer = Phaser.Math.Between(2000, 5000);
+      } else {
+        // Continue moving toward target
+        const angle = Phaser.Math.Angle.Between(
+          this.x,
+          this.y,
+          this.targetPosition.x,
+          this.targetPosition.y
+        );
+        
+        const velocityX = Math.cos(angle) * this.speed;
+        const velocityY = Math.sin(angle) * this.speed;
+        
+        body.setVelocity(velocityX, velocityY);
+
+        // Update animation
+        const direction = this.getDirectionFromVelocity(velocityX, velocityY);
+        this.updateAnimation(direction);
+
+        // Timeout if taking too long
+        this.moveTimer -= delta;
+        if (this.moveTimer <= 0) {
+          this.stopMoving();
+          this.idleTimer = Phaser.Math.Between(1000, 3000);
+        }
+      }
+    } else {
+      // Idle state
+      this.idleTimer -= delta;
+      if (this.idleTimer <= 0) {
+        // Pick a new random destination
+        this.pickNewDestination();
+      }
+    }
+  }
+
+  /**
+   * Pick a random destination within wander radius
+   */
+  private pickNewDestination(): void {
+    const angle = Phaser.Math.FloatBetween(0, Math.PI * 2);
+    const distance = Phaser.Math.FloatBetween(50, this.wanderRadius);
+    
+    this.targetPosition = {
+      x: this.homePosition.x + Math.cos(angle) * distance,
+      y: this.homePosition.y + Math.sin(angle) * distance
+    };
+
+    // Clamp to world bounds
+    const worldBounds = this.scene.physics.world.bounds;
+    this.targetPosition.x = Phaser.Math.Clamp(
+      this.targetPosition.x,
+      worldBounds.x + 50,
+      worldBounds.x + worldBounds.width - 50
+    );
+    this.targetPosition.y = Phaser.Math.Clamp(
+      this.targetPosition.y,
+      worldBounds.y + 50,
+      worldBounds.y + worldBounds.height - 50
+    );
+
+    this.isMoving = true;
+    this.moveTimer = 5000; // 5 second timeout
+  }
+
+  /**
+   * Stop moving and return to idle
+   */
+  private stopMoving(): void {
+    this.isMoving = false;
+    this.targetPosition = null;
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocity(0, 0);
+    this.stopAnimation();
+  }
+
+  /**
+   * Get the 8-directional direction string from velocity
+   */
+  private getDirectionFromVelocity(vx: number, vy: number): string {
+    const angle = Math.atan2(vy, vx);
+    let degrees = (angle * 180 / Math.PI + 360) % 360;
+    
+    if (degrees >= 337.5 || degrees < 22.5) return 'east';
+    if (degrees >= 22.5 && degrees < 67.5) return 'south-east';
+    if (degrees >= 67.5 && degrees < 112.5) return 'south';
+    if (degrees >= 112.5 && degrees < 157.5) return 'south-west';
+    if (degrees >= 157.5 && degrees < 202.5) return 'west';
+    if (degrees >= 202.5 && degrees < 247.5) return 'north-west';
+    if (degrees >= 247.5 && degrees < 292.5) return 'north';
+    return 'north-east';
+  }
+
+  /**
+   * Update the character animation based on direction
+   */
+  private updateAnimation(direction: string): void {
+    if (direction === this.currentDirection) {
+      if (!this.sprite.anims.isPlaying) {
+        this.sprite.play(`${this.characterName}-walk-${direction}`, true);
+      }
+      return;
+    }
+
+    this.currentDirection = direction;
+    const animKey = `${this.characterName}-walk-${direction}`;
+    
+    if (this.scene.anims.exists(animKey)) {
+      this.sprite.play(animKey, true);
+    } else {
+      const idleKey = `${this.characterName}-idle-${direction}`;
+      if (this.scene.textures.exists(idleKey)) {
+        this.sprite.setTexture(idleKey);
+      }
+    }
+  }
+
+  /**
+   * Stop the walk animation and show idle frame
+   */
+  private stopAnimation(): void {
+    this.sprite.stop();
+    const idleKey = `${this.characterName}-idle-${this.currentDirection}`;
+    if (this.scene.textures.exists(idleKey)) {
+      this.sprite.setTexture(idleKey);
+    }
+  }
+
+  /**
+   * Get character name
+   */
+  public getCharacterName(): string {
+    return this.characterName;
+  }
+}

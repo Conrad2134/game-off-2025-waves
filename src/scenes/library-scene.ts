@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PlayerCharacter } from '../entities/player-character';
+import { NPCCharacter } from '../entities/npc-character';
 import type {
   LibraryLayoutConfig,
   FurnitureConfig,
@@ -19,6 +20,7 @@ import type {
  */
 export class LibraryScene extends Phaser.Scene {
   private player!: PlayerCharacter;
+  private npcs: NPCCharacter[] = [];
   private furnitureGroup!: Phaser.Physics.Arcade.StaticGroup;
   private wallsGroup!: Phaser.Physics.Arcade.StaticGroup;
   private sceneLayout!: LibraryLayoutConfig;
@@ -46,20 +48,25 @@ export class LibraryScene extends Phaser.Scene {
     // Load Klaus character animations and idle sprites
     const directions = ['south', 'south-east', 'east', 'north-east', 'north', 'north-west', 'west', 'south-west'];
     
-    // Load walking animation frames
-    directions.forEach(direction => {
-      for (let i = 0; i < 4; i++) {
-        this.load.image(`klaus-walk-${direction}-${i}`, 
-          `assets/sprites/characters/klaus/animations/walking-4-frames/${direction}/frame_00${i}.png`
-        );
-      }
-    });
+    // Load all characters (Klaus, Valentin, Sebastian, Marianne, Emma, Luca)
+    const characters = ['klaus', 'valentin', 'sebastian', 'marianne', 'emma', 'luca'];
+    
+    characters.forEach(charName => {
+      // Load walking animation frames
+      directions.forEach(direction => {
+        for (let i = 0; i < 4; i++) {
+          this.load.image(`${charName}-walk-${direction}-${i}`, 
+            `assets/sprites/characters/${charName}/animations/walking-4-frames/${direction}/frame_00${i}.png`
+          );
+        }
+      });
 
-    // Load idle rotations
-    directions.forEach(direction => {
-      this.load.image(`klaus-idle-${direction}`, 
-        `assets/sprites/characters/klaus/rotations/${direction}.png`
-      );
+      // Load idle rotations
+      directions.forEach(direction => {
+        this.load.image(`${charName}-idle-${direction}`, 
+          `assets/sprites/characters/${charName}/rotations/${direction}.png`
+        );
+      });
     });
 
     // Load castle floor tileset
@@ -98,8 +105,8 @@ export class LibraryScene extends Phaser.Scene {
     this.spawnFurniture(this.sceneLayout.furniture);
     this.createWalls(this.sceneLayout.walls);
 
-    // Create Klaus character animations
-    this.createKlausAnimations();
+    // Create character animations for all characters
+    this.createCharacterAnimations();
 
     // Spawn player (Klaus)
     const spawnPos = data?.spawnPosition ?? this.sceneLayout.playerSpawn;
@@ -113,6 +120,9 @@ export class LibraryScene extends Phaser.Scene {
       y: spawnPos.y,
       spriteKey: playerSpriteKey,
     });
+
+    // Spawn NPCs
+    this.spawnNPCs();
 
     // Setup camera
     this.cameras.main.setBounds(
@@ -128,6 +138,20 @@ export class LibraryScene extends Phaser.Scene {
     // Setup collisions
     this.physics.add.collider(this.player, this.furnitureGroup);
     this.physics.add.collider(this.player, this.wallsGroup);
+    
+    // NPC collisions
+    this.npcs.forEach(npc => {
+      this.physics.add.collider(npc, this.furnitureGroup);
+      this.physics.add.collider(npc, this.wallsGroup);
+      this.physics.add.collider(npc, this.player);
+    });
+    
+    // NPC to NPC collisions
+    for (let i = 0; i < this.npcs.length; i++) {
+      for (let j = i + 1; j < this.npcs.length; j++) {
+        this.physics.add.collider(this.npcs[i], this.npcs[j]);
+      }
+    }
 
     // Setup debug mode toggle (D key)
     this.input.keyboard?.on('keydown-D', () => {
@@ -150,6 +174,9 @@ export class LibraryScene extends Phaser.Scene {
    */
   update(_time: number, delta: number): void {
     this.player.update(delta);
+    
+    // Update all NPCs
+    this.npcs.forEach(npc => npc.update(delta));
 
     // Debug info
     if (this.debugMode) {
@@ -200,38 +227,68 @@ export class LibraryScene extends Phaser.Scene {
   }
 
   /**
-   * Create animations for Klaus character
+   * Create animations for all characters
    */
-  private createKlausAnimations(): void {
+  private createCharacterAnimations(): void {
     const directions = ['south', 'south-east', 'east', 'north-east', 'north', 'north-west', 'west', 'south-west'];
+    const characters = ['klaus', 'valentin', 'sebastian', 'marianne', 'emma', 'luca'];
     
-    directions.forEach(direction => {
-      const animKey = `klaus-walk-${direction}`;
-      
-      // Skip if animation already exists
-      if (this.anims.exists(animKey)) return;
+    characters.forEach(charName => {
+      directions.forEach(direction => {
+        const animKey = `${charName}-walk-${direction}`;
+        
+        // Skip if animation already exists
+        if (this.anims.exists(animKey)) return;
 
-      // Check if frames are loaded
-      if (this.assetErrors.has(`klaus-walk-${direction}-0`)) {
-        console.warn(`Klaus walk animation frames not loaded for ${direction}`);
-        return;
-      }
+        // Check if frames are loaded
+        if (this.assetErrors.has(`${charName}-walk-${direction}-0`)) {
+          console.warn(`${charName} walk animation frames not loaded for ${direction}`);
+          return;
+        }
 
-      // Create animation from individual frames
-      this.anims.create({
-        key: animKey,
-        frames: [
-          { key: `klaus-walk-${direction}-0` },
-          { key: `klaus-walk-${direction}-1` },
-          { key: `klaus-walk-${direction}-2` },
-          { key: `klaus-walk-${direction}-3` },
-        ],
-        frameRate: 8,
-        repeat: -1
+        // Create animation from individual frames
+        this.anims.create({
+          key: animKey,
+          frames: [
+            { key: `${charName}-walk-${direction}-0` },
+            { key: `${charName}-walk-${direction}-1` },
+            { key: `${charName}-walk-${direction}-2` },
+            { key: `${charName}-walk-${direction}-3` },
+          ],
+          frameRate: 8,
+          repeat: -1
+        });
       });
     });
 
-    console.log('✓ Created Klaus walking animations');
+    console.log(`✓ Created walking animations for ${characters.length} characters`);
+  }
+
+  /**
+   * Spawn NPC characters in the library
+   */
+  private spawnNPCs(): void {
+    const npcConfigs = [
+      { name: 'valentin', x: 300, y: 200 },
+      { name: 'sebastian', x: 900, y: 300 },
+      { name: 'marianne', x: 400, y: 600 },
+      { name: 'emma', x: 800, y: 500 },
+      { name: 'luca', x: 200, y: 500 },
+    ];
+
+    npcConfigs.forEach(config => {
+      const npc = new NPCCharacter({
+        scene: this,
+        x: config.x,
+        y: config.y,
+        characterName: config.name,
+        speed: 80,
+        wanderRadius: 150,
+      });
+      this.npcs.push(npc);
+    });
+
+    console.log(`✓ Spawned ${this.npcs.length} NPCs`);
   }
 
   /**
