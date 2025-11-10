@@ -13,7 +13,7 @@
     }
   },
   "incidentTrigger": {
-    "requiresNPCsIntroduced": ["emma", "luca", "marianne", "sebastian", "valentin"],
+    "requiresNPCsIntroduced": ["emma", "luca", "marianne", "sebastian"],
     "delayMs": 2000
   },
   "incidentCutscene": {

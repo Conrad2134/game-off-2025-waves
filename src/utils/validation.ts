@@ -50,8 +50,8 @@ export function validateProgressionConfig(data: any): ValidationResult {
   } else {
     if (!Array.isArray(data.incidentTrigger.requiresNPCsIntroduced)) {
       errors.push('incidentTrigger.requiresNPCsIntroduced must be an array');
-    } else if (data.incidentTrigger.requiresNPCsIntroduced.length !== 5) {
-      errors.push('incidentTrigger.requiresNPCsIntroduced must have exactly 5 NPCs');
+    } else if (data.incidentTrigger.requiresNPCsIntroduced.length !== 4) {
+      errors.push('incidentTrigger.requiresNPCsIntroduced must have exactly 4 NPCs');
     }
     
     if (typeof data.incidentTrigger.delayMs !== 'number') {

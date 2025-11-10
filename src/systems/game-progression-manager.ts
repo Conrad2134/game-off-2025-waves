@@ -183,7 +183,7 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
 
     this.introducedNPCs.add(npcId);
     this.emit('npc-introduced', { npcId });
-    console.log(`NPC introduced: ${npcId} (${this.introducedNPCs.size}/${this.config?.incidentTrigger.requiresNPCsIntroduced.length ?? 5})`);
+    console.log(`NPC introduced: ${npcId} (${this.introducedNPCs.size}/${this.config?.incidentTrigger.requiresNPCsIntroduced.length ?? 4})`);
 
     this.debouncedSave();
 
