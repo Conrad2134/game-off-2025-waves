@@ -466,62 +466,9 @@ export class LibraryScene extends Phaser.Scene {
    * Spawn interactable objects in the library
    */
   private spawnInteractableObjects(): void {
-    // Find existing furniture sprites and make some of them interactable
-    const objectConfigs = [
-      {
-        id: 'bookshelf-north',
-        spriteKey: 'bookshelf-tall',
-        x: 600,
-        y: 100,
-        description: 'A tall bookshelf filled with old mystery novels. The books look well-read and dusty.',
-        recordInNotebook: false,
-      },
-      {
-        id: 'dining-table',
-        spriteKey: 'dining-table',
-        x: 600,
-        y: 400,
-        description: 'A large wooden dining table. This is where the stolen Erdbeerstrudel was last seen!',
-        recordInNotebook: true,
-        notebookNote: 'Where the strudel was last seen.',
-      },
-      {
-        id: 'desk',
-        spriteKey: 'desk',
-        x: 200,
-        y: 300,
-        description: 'A sturdy oak desk with scattered papers and an inkwell. Someone has been taking notes.',
-        recordInNotebook: true,
-        notebookNote: 'Papers and inkwell. Someone writing notes.',
-      },
-    ];
-
-    objectConfigs.forEach(config => {
-      try {
-        const obj = new InteractableObject({
-          scene: this,
-          x: config.x,
-          y: config.y,
-          spriteKey: config.spriteKey,
-          id: config.id,
-          description: config.description,
-          interactionRange: 60,
-        });
-        
-        // Set the recordInNotebook flag and note on the dialog data
-        obj.dialogData.recordInNotebook = config.recordInNotebook;
-        if ('notebookNote' in config) {
-          obj.dialogData.notebookNote = config.notebookNote;
-        }
-        
-        obj.setDepth(5); // Above floor, below NPCs
-        this.interactableObjects.push(obj);
-      } catch (error) {
-        console.warn(`Failed to create interactable object ${config.id}:`, error);
-      }
-    });
-
-    console.log(`✓ Spawned ${this.interactableObjects.length} interactable objects`);
+    // Interactable objects are now spawned from clues.json by the ClueTracker
+    // This method is kept for any non-clue interactables if needed in the future
+    console.log(`✓ Interactable objects will be spawned by ClueTracker from clues.json`);
   }
 
   /**
@@ -767,9 +714,9 @@ export class LibraryScene extends Phaser.Scene {
       this.interactionDetector.registerInteractable(npc);
     });
 
-    // Register all interactable objects
-    this.interactableObjects.forEach(obj => {
-      this.interactionDetector.registerInteractable(obj);
+    // Register all clue objects as interactable (will be updated based on phase)
+    this.clueTracker.getClueObjects().forEach(clueObj => {
+      this.interactionDetector.registerInteractable(clueObj);
     });
 
     // Setup interaction keys
@@ -937,11 +884,6 @@ export class LibraryScene extends Phaser.Scene {
           if (clue.initiallyUnlocked) {
             this.clueTracker.unlockClue(clue.id);
           }
-        });
-        
-        // Enable interactable objects (they're clues too)
-        this.interactableObjects.forEach(obj => {
-          obj.setInteractable(true);
         });
       }
     });
@@ -1154,7 +1096,16 @@ export class LibraryScene extends Phaser.Scene {
           Phaser.Input.Keyboard.JustDown(this.enterKey)) {
         const entity = this.interactionDetector.getClosestInteractable();
         if (entity) {
-          // Determine if it's an NPC or object
+          // Check if this is a clue object
+          const clue = this.clueTracker.getClueById(entity.id);
+          if (clue && this.clueTracker.canInteract(entity.id)) {
+            // This is an unlocked clue - discover it!
+            console.log(`🔍 Player interacting with clue: ${entity.id}`);
+            this.clueTracker.discoverClue(entity.id);
+            return; // Don't open dialog, just discover the clue
+          }
+          
+          // Not a clue, handle as normal NPC or object interaction
           const isNPC = entity instanceof NPCCharacter;
           const sourceType = isNPC ? 'npc' : 'object';
           

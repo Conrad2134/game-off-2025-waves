@@ -98,7 +98,7 @@ export interface DialogData {
  * Extended DialogData for phase-based progression system
  * Supports multi-tier dialog selection based on game progress
  */
-export interface PhaseBasedDialogData extends DialogData {
+export interface PhaseBasedDialogData {
   /** Introduction dialog (pre-incident phase) */
   introduction?: {
     lines: string[];

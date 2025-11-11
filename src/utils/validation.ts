@@ -5,8 +5,7 @@
  * Validates data structure, required fields, and value constraints.
  */
 
-import type { ProgressionConfig, ValidationResult, CharacterDialogData } from '../types/progression';
-import type { CluesConfig } from '../types/clue';
+import type { ValidationResult } from '../types/progression';
 
 /**
  * Validate progression configuration data

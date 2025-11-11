@@ -106,8 +106,30 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
           });
         }
       };
+      (window as any).showClues = () => {
+        console.log('🔍 Clue Status:');
+        console.log(`  Unlocked (${this.unlockedClues.size}): [${Array.from(this.unlockedClues).join(', ')}]`);
+        console.log(`  Discovered (${this.discoveredClues.size}): [${Array.from(this.discoveredClues).join(', ')}]`);
+        console.log(`  Current Dialog Tier: ${this.getDialogTier()}`);
+      };
+      (window as any).unlockAllClues = () => {
+        console.log('🔓 Unlocking all clues...');
+        const clueIds = ['strudel-crumbs', 'suspicious-napkin', 'desk-papers', 'bookshelf-hiding-spot', 'empty-plate'];
+        clueIds.forEach(id => {
+          this.unlockedClues.add(id);
+        });
+        console.log(`✓ All ${clueIds.length} clues unlocked`);
+        this.scene.events.emit('debug-unlock-all-clues');
+      };
+      (window as any).discoverClue = (clueId: string) => {
+        console.log(`� Manually discovering clue: ${clueId}`);
+        this.notifyClueDiscovered(clueId);
+      };
       console.log('�💡 Debug: Use window.resetGame() to clear save data');
       console.log('💡 Debug: Use window.showConversations() to view conversation counts');
+      console.log('💡 Debug: Use window.showClues() to view clue status');
+      console.log('💡 Debug: Use window.unlockAllClues() to unlock all clues');
+      console.log('💡 Debug: Use window.discoverClue("clue-id") to discover a clue');
     }
   }
 
@@ -181,7 +203,9 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
    * Get count of discovered clues
    */
   getDiscoveredClueCount(): number {
-    return this.discoveredClues.size;
+    const count = this.discoveredClues.size;
+    console.log(`[ProgressionManager.getDiscoveredClueCount] Returning: ${count}, Clues: [${Array.from(this.discoveredClues).join(', ')}]`);
+    return count;
   }
 
   /**
@@ -189,10 +213,12 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
    */
   getDialogTier(): number {
     const clueCount = this.discoveredClues.size;
-    if (clueCount >= 5) return 3;
-    if (clueCount >= 3) return 2;
-    if (clueCount >= 1) return 1;
-    return 0;
+    let tier = 0;
+    if (clueCount >= 5) tier = 3;
+    else if (clueCount >= 3) tier = 2;
+    else if (clueCount >= 1) tier = 1;
+    console.log(`[ProgressionManager.getDialogTier] Clue count: ${clueCount} → Tier: ${tier}`);
+    return tier;
   }
 
   /**
@@ -278,8 +304,13 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
       console.warn(`Clue ${clueId} discovered but not unlocked!`);
     }
 
+    const beforeSize = this.discoveredClues.size;
     this.discoveredClues.add(clueId);
-    console.log(`Clue discovered: ${clueId} (total: ${this.discoveredClues.size}, tier: ${this.getDialogTier()})`);
+    const afterSize = this.discoveredClues.size;
+    console.log(`🔍 [ProgressionManager.notifyClueDiscovered] Clue: ${clueId}`);
+    console.log(`   Before: ${beforeSize} clues, After: ${afterSize} clues`);
+    console.log(`   All discovered: [${Array.from(this.discoveredClues).join(', ')}]`);
+    console.log(`   Current tier: ${this.getDialogTier()}`);
     this.debouncedSave();
   }
 

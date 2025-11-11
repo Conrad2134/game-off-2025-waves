@@ -8,6 +8,7 @@
 import Phaser from 'phaser';
 import type { ClueData, ClueState, CluesConfig } from '../types/clue';
 import type { SaveManager } from './save-manager';
+import { InteractableObject } from '../entities/interactable-object';
 import { validateCluesConfig, logValidationResult } from '../utils/validation';
 
 export interface ClueTrackerConfig {
@@ -23,6 +24,7 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
   private registryKey: string;
   private clues: Map<string, ClueData> = new Map();
   private clueSprites: Phaser.GameObjects.Group;
+  private clueObjects: InteractableObject[] = [];
   private pulseTime: number = 0;
   private initialized: boolean = false;
   private saveManager: SaveManager | null = null;
@@ -79,6 +81,21 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
     // Listen for unlock requests from dialog manager
     this.scene.events.on('clue-unlock-requested', this.handleUnlockRequest, this);
 
+    // Listen for debug unlock all event
+    this.scene.events.on('debug-unlock-all-clues', () => {
+      console.log('🔓 [ClueTracker] Debug: Unlocking all clues visually...');
+      this.clues.forEach(clue => {
+        if (clue.state === 'locked') {
+          clue.state = 'unlocked';
+          this.updateClueVisual(clue);
+          if (clue.sprite && clue.sprite instanceof InteractableObject) {
+            clue.sprite.setInteractable(true);
+          }
+        }
+      });
+      console.log('✓ [ClueTracker] All clues are now unlocked and interactive');
+    });
+
     this.initialized = true;
     console.log(`✓ ClueTracker initialized with ${this.clues.size} clues`);
   }
@@ -115,32 +132,49 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
   }
 
   /**
-   * Spawn visual representation for a clue
+   * Spawn visual representation for a clue as an InteractableObject
    */
   private spawnClueSprite(clue: ClueData): void {
-    // For now, create a simple rectangle placeholder
-    // In production, this would load actual clue sprites
+    // Create a small glowing orb/indicator texture for the clue
+    // This represents the "point of interest" on/near the physical object
     const graphics = this.scene.add.graphics();
-    graphics.fillStyle(0xffffff, 1.0);
-    graphics.fillRect(0, 0, clue.displaySize.width, clue.displaySize.height);
-    graphics.generateTexture(`clue-temp-${clue.id}`, clue.displaySize.width, clue.displaySize.height);
+    
+    // Draw a small glowing circle
+    graphics.fillStyle(0xffffff, 0.8);
+    graphics.fillCircle(clue.displaySize.width / 2, clue.displaySize.height / 2, Math.min(clue.displaySize.width, clue.displaySize.height) / 2);
+    
+    // Add a subtle outline
+    graphics.lineStyle(2, 0xffff00, 0.6);
+    graphics.strokeCircle(clue.displaySize.width / 2, clue.displaySize.height / 2, Math.min(clue.displaySize.width, clue.displaySize.height) / 2);
+    
+    graphics.generateTexture(`clue-indicator-${clue.id}`, clue.displaySize.width, clue.displaySize.height);
     graphics.destroy();
 
-    const sprite = this.scene.add.sprite(
-      clue.position.x,
-      clue.position.y,
-      `clue-temp-${clue.id}`
-    );
+    // Create InteractableObject for the clue
+    // This is a small interactive hotspot, not the physical object itself
+    const clueObject = new InteractableObject({
+      scene: this.scene,
+      x: clue.position.x,
+      y: clue.position.y,
+      spriteKey: `clue-indicator-${clue.id}`,
+      id: clue.id,
+      description: clue.description,
+      interactionRange: clue.interactionRange,
+    });
 
-    sprite.setDepth(2); // Below NPCs, above floor
-    sprite.setOrigin(0.5, 0.5);
+    clueObject.setDepth(6); // Above furniture so it's visible
+    clueObject.setOrigin(0.5, 0.5);
     
-    // Make sprite non-interactive by default (will be enabled when clues are enabled)
-    sprite.setInteractive({ useHandCursor: false });
-    sprite.disableInteractive();
+    // Setup dialog data for notebook recording
+    clueObject.dialogData.recordInNotebook = true;
+    clueObject.dialogData.notebookNote = clue.notebookNote;
+    
+    // Start with interaction disabled (will be enabled when clues become available)
+    clueObject.setInteractable(false);
 
-    clue.sprite = sprite;
-    this.clueSprites.add(sprite);
+    clue.sprite = clueObject;
+    this.clueSprites.add(clueObject);
+    this.clueObjects.push(clueObject);
 
     // Set initial visual state
     this.updateClueVisual(clue);
@@ -152,26 +186,24 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
   private updateClueVisual(clue: ClueData): void {
     if (!clue.sprite) return;
 
-    // Hide clues if not enabled (pre-incident phase)
-    if (!this.cluesEnabled) {
-      clue.sprite.setVisible(false);
-      return;
-    }
-
-    clue.sprite.setVisible(true);
-
+    // Clue indicators show/hide based on state
+    // The physical furniture is always visible - these are just interaction points
     switch (clue.state) {
       case 'locked':
-        clue.sprite.setTint(0xaaaaaa);
-        clue.sprite.setAlpha(0.5);
+        // Locked clues are invisible - the physical object exists but no indicator shows
+        clue.sprite.setVisible(false);
+        clue.sprite.setAlpha(0);
         break;
       case 'unlocked':
+        // Unlocked clues show a bright yellow glow to indicate they're interactable
+        clue.sprite.setVisible(true);
         clue.sprite.setTint(0xffff00);
         clue.sprite.setAlpha(1.0);
         break;
       case 'discovered':
-        clue.sprite.setTint(0xffffff);
-        clue.sprite.setAlpha(0.7);
+        // Discovered clues fade out or disappear
+        clue.sprite.setVisible(false);
+        clue.sprite.setAlpha(0);
         break;
     }
   }
@@ -188,6 +220,13 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
    */
   getAllClues(): ClueData[] {
     return Array.from(this.clues.values());
+  }
+
+  /**
+   * Get all clue InteractableObjects for registration with interaction detector
+   */
+  getClueObjects(): InteractableObject[] {
+    return this.clueObjects;
   }
 
   /**
@@ -235,6 +274,12 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
 
     clue.state = 'unlocked';
     this.updateClueVisual(clue);
+    
+    // Enable interaction on the clue object
+    if (clue.sprite && clue.sprite instanceof InteractableObject) {
+      clue.sprite.setInteractable(true);
+    }
+    
     this.emit('clue-unlocked', { clueId, clue });
 
     // Notify progression manager

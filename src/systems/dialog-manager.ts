@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { DialogManagerConfig, DialogMessage, DialogData, DialogTier } from '../types/dialog';
+import type { DialogManagerConfig, DialogMessage, DialogData } from '../types/dialog';
 import type { DialogBox } from '../components/dialog-box';
 import type { NotebookManager } from './notebook-manager';
 import type { GameProgressionManager } from './game-progression-manager';
@@ -123,17 +123,22 @@ export class DialogManager {
 
     // Use phase-based selection for NPCs if progression manager available
     let messageData = dialogData;
+    let effectiveTier = 0;
     if (sourceType === 'npc' && this.progressionManager) {
       const phase = this.progressionManager.getCurrentPhase();
-      const tier = this.progressionManager.getDialogTier();
+      const requestedTier = this.progressionManager.getDialogTier();
       
-      // Check count BEFORE selecting dialog
-      const countBefore = this.progressionManager.getConversationCount(sourceId, tier);
-      console.log(`[Dialog.open] ${sourceId} - Count BEFORE selectDialog: ${countBefore}`);
+      // Select dialog and get the actual tier used
+      const result = this.selectDialog(sourceId, phase, requestedTier);
+      messageData = result.data;
+      effectiveTier = result.effectiveTier;
       
-      messageData = this.selectDialog(sourceId, phase, tier);
+      // Check count BEFORE recording conversation
+      const countBefore = this.progressionManager.getConversationCount(sourceId, effectiveTier);
+      console.log(`[Dialog.open] ${sourceId} - Count BEFORE: ${countBefore}, Requested tier: ${requestedTier}, Effective tier: ${effectiveTier}`);
+      
       this.currentNPCId = sourceId;
-      this.currentTier = tier;
+      this.currentTier = effectiveTier; // Track the actual tier being shown
     }
 
     const message = this.createMessage(messageData, sourceType, sourceId, speakerName);
@@ -151,6 +156,7 @@ export class DialogManager {
     // ONLY record conversations during post-incident phase (not introductions)
     if (sourceType === 'npc' && this.progressionManager && this.currentNPCId) {
       const phase = this.progressionManager.getCurrentPhase();
+      console.log(`[Dialog.open] Recording conversation - NPC: ${this.currentNPCId}, Phase: ${phase}, Tier: ${this.currentTier}`);
       if (phase === 'post-incident') {
         const countBefore = this.progressionManager.getConversationCount(this.currentNPCId, this.currentTier);
         console.log(`[Dialog.open] ${this.currentNPCId} - Count BEFORE recordConversation: ${countBefore}`);
@@ -340,51 +346,97 @@ export class DialogManager {
   }
 
   /**
-   * Select appropriate dialog content based on phase and tier
+   * Get the highest available dialog tier based on discovered clues
    */
-  private selectDialog(characterId: string, phase: GamePhase, tier: number): DialogData {
+  private getAvailableTier(characterId: string): number {
+    const charData = this.dialogCache.get(characterId);
+    if (!charData || !charData.postIncident) {
+      return 0;
+    }
+
+    const discoveredCount = this.progressionManager?.getDiscoveredClueCount() ?? 0;
+    console.log(`[getAvailableTier] ${characterId} - Discovered clues: ${discoveredCount}`);
+    
+    // Find the highest tier that the player has unlocked
+    let availableTier = 0;
+    for (let i = charData.postIncident.length - 1; i >= 0; i--) {
+      const tierData = charData.postIncident[i];
+      console.log(`[getAvailableTier] ${characterId} - Checking tier ${i}: requires ${tierData.requiredClues} clues, have ${discoveredCount}`);
+      if (discoveredCount >= tierData.requiredClues) {
+        availableTier = i;
+        console.log(`[getAvailableTier] ${characterId} - Tier ${i} is available!`);
+        break;
+      }
+    }
+
+    console.log(`[getAvailableTier] ${characterId} - Final available tier: ${availableTier}`);
+    return availableTier;
+  }
+
+  /**
+   * Select appropriate dialog content based on phase and tier
+   * Returns both the dialog data and the effective tier used
+   */
+  private selectDialog(characterId: string, phase: GamePhase, tier: number): { data: DialogData; effectiveTier: number } {
     const charData = this.dialogCache.get(characterId);
     if (!charData) {
       console.warn(`No dialog data for character: ${characterId}`);
-      return this.fallbackDialog();
+      return { data: this.fallbackDialog(), effectiveTier: 0 };
     }
 
     if (phase === 'pre-incident') {
       // Return introduction dialog
       console.log(`[Dialog] ${characterId} - Phase: ${phase} - Showing introduction`);
       return {
-        lines: charData.introduction.lines,
-        recordInNotebook: charData.introduction.recordInNotebook,
-        notebookNote: charData.introduction.notebookNote,
+        data: {
+          lines: charData.introduction.lines,
+          recordInNotebook: charData.introduction.recordInNotebook,
+          notebookNote: charData.introduction.notebookNote,
+        },
+        effectiveTier: 0,
       };
     } else {
-      // Post-incident: select tier
-      if (!charData.postIncident || tier >= charData.postIncident.length) {
-        console.warn(`No tier ${tier} dialog for ${characterId}`);
-        return this.fallbackDialog();
+      // Post-incident: check if tier is available based on clues discovered
+      const availableTier = this.getAvailableTier(characterId);
+      const effectiveTier = Math.min(tier, availableTier);
+      
+      if (effectiveTier !== tier) {
+        console.log(`[Dialog] ${characterId} - Tier ${tier} not unlocked yet (max available: ${availableTier})`);
       }
 
-      const tierData = charData.postIncident[tier];
-      const conversationCount = this.progressionManager?.getConversationCount(characterId, tier) ?? 0;
+      // Select tier
+      if (!charData.postIncident || effectiveTier >= charData.postIncident.length) {
+        console.warn(`No tier ${effectiveTier} dialog for ${characterId}`);
+        return { data: this.fallbackDialog(), effectiveTier: 0 };
+      }
+
+      const tierData = charData.postIncident[effectiveTier];
+      const conversationCount = this.progressionManager?.getConversationCount(characterId, effectiveTier) ?? 0;
 
       // Debug output
-      console.log(`[Dialog] ${characterId} - Phase: ${phase}, Tier: ${tier}, ConversationCount: ${conversationCount}`);
+      console.log(`[Dialog] ${characterId} - Phase: ${phase}, Tier: ${effectiveTier} (requested: ${tier}), ConversationCount: ${conversationCount}, Clues: ${this.progressionManager?.getDiscoveredClueCount() ?? 0}`);
 
       // First conversation at this tier: use initial lines
       if (conversationCount === 0) {
         console.log(`[Dialog] ${characterId} - Showing INITIAL lines (recordInNotebook: ${tierData.recordInNotebook})`);
         return {
-          lines: tierData.lines,
-          recordInNotebook: tierData.recordInNotebook,
-          notebookNote: tierData.notebookNote,
+          data: {
+            lines: tierData.lines,
+            recordInNotebook: tierData.recordInNotebook,
+            notebookNote: tierData.notebookNote,
+          },
+          effectiveTier,
         };
       } else {
         // Follow-up conversation: cycle through follow-up lines
         const index = (conversationCount - 1) % tierData.followUpLines.length;
         console.log(`[Dialog] ${characterId} - Showing FOLLOW-UP line ${index + 1}/${tierData.followUpLines.length}`);
         return {
-          lines: [tierData.followUpLines[index]],
-          recordInNotebook: false, // Don't record follow-ups
+          data: {
+            lines: [tierData.followUpLines[index]],
+            recordInNotebook: false, // Don't record follow-ups
+          },
+          effectiveTier,
         };
       }
     }
