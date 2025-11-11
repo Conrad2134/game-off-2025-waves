@@ -15,65 +15,66 @@
       "tier": 0,
       "requiredClues": 0,
       "lines": [
-        "Whoa, this is intense! Someone actually ate it?",
-        "I barely know anyone here, so it definitely wasn't me.",
-        "I was checking out the books on the far wall. Didn't see anything."
+        "This is insane! Everyone talks about this strudel like it's the Holy Grail.",
+        "Look, I'm new here. I don't know the... politics of Valentin's baking.",
+        "I was over by the western bookshelf, completely absorbed in a book about German castles."
       ],
       "followUpLines": [
-        "This is wild. My first party here and this happens?",
-        "I hope you find who did it. I don't want to be suspected!",
-        "Being the new person makes me look suspicious, doesn't it?"
+        "I know how this looks. New guy, mysterious stranger, perfect scapegoat.",
+        "But I swear I wouldn't risk my new friendships over pastry!",
+        "Check with anyone - I was nowhere near that table when it happened."
       ],
-      "recordInNotebook": false
+      "recordInNotebook": true,
+      "notebookNote": "Luca is new to the group and claims he was reading by the western bookshelf. Worried about being blamed as the outsider."
     },
     {
       "tier": 1,
       "requiredClues": 1,
       "lines": [
-        "You found a clue? That's something at least.",
-        "Look, I know I'm the new guy, but I swear I didn't do it.",
-        "Although... I did notice something odd behind the bookshelf earlier. Might be worth checking out?"
+        "Evidence? Good! Maybe that will clear my name.",
+        "Actually, I can help. I saw crumbs on the floor near the east wall.",
+        "And there's a narrow gap behind the tall bookshelf. Perfect for... hiding something?"
       ],
       "followUpLines": [
-        "Did you check behind the bookshelf?",
-        "I'm just trying to be helpful here!",
-        "Please believe me, I'm not the culprit."
+        "I noticed it because I was trying to see the books on the top shelf.",
+        "Someone could easily slip back there if they needed to hide evidence.",
+        "I'm trying to prove I'm innocent by being helpful!"
       ],
       "recordInNotebook": true,
-      "notebookNote": "Luca is defensive about being new. Mentioned something behind the bookshelf."
+      "notebookNote": "Luca noticed crumbs and points out a hiding spot behind the bookshelf. Being helpful or deflecting?"
     },
     {
       "tier": 2,
       "requiredClues": 3,
       "lines": [
-        "Wow, you're really solving this mystery!",
-        "Okay, I'll be completely honest now.",
-        "I saw Marianne near the dessert table right before Valentin left. She was acting kind of nervous."
+        "Alright, I need to tell you something important.",
+        "Marianne. She was at the dessert table before Valentin made his announcement.",
+        "She was reaching toward it... then pulled back when someone looked her way."
       ],
       "followUpLines": [
-        "I probably should have mentioned that earlier...",
-        "But I didn't want to throw anyone under the bus without proof.",
-        "Go ahead and check behind that bookshelf like I mentioned."
+        "She's been trying to get his recipe for years, everyone says.",
+        "What if she wanted to taste it before everyone else?",
+        "That hiding spot behind the bookshelf - perfect place to stash evidence."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Luca saw Marianne near the dessert table looking nervous. Why wait to mention this?",
+      "notebookNote": "Luca saw Marianne reaching for the strudel and pulling back when watched. Accurate testimony or convenient accusation?",
       "unlocksClues": ["bookshelf-hiding-spot"]
     },
     {
       "tier": 3,
       "requiredClues": 5,
       "lines": [
-        "Alright, you got me. I'll come clean.",
-        "I did eat a little bit of the strudel. Just a taste!",
-        "But when I came back later, the whole thing was gone. Someone else finished it after me!"
+        "*defeated sigh* Fine. Yes. I tried it.",
+        "Everyone kept going on and on about how legendary it was. I couldn't resist.",
+        "I took one piece - ONE! - while people were distracted. But there were already pieces missing!"
       ],
       "followUpLines": [
-        "I know I shouldn't have taken that first bite...",
-        "But I was curious! Everyone hyped it up so much!",
-        "I'm sorry, okay? But I'm not the only guilty one here."
+        "I'm not trying to dodge responsibility. I'm guilty of curiosity.",
+        "But this is bigger than me. At least three people took pieces.",
+        "We all wanted to try Valentin's famous erdbeerstrudel before it was officially served."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Luca admits to taking 'just a taste' but claims someone else finished it. Believable?"
+      "notebookNote": "Luca confesses to taking one piece out of curiosity, but claims multiple pieces were already missing. Collective crime?"
     }
   ]
 }

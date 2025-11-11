@@ -15,64 +15,65 @@
       "tier": 0,
       "requiredClues": 0,
       "lines": [
-        "How absolutely dreadful! Poor Valentin must be devastated.",
-        "I was near the window, enjoying the view.",
-        "I certainly didn't see anyone tampering with the strudel."
+        "What a terrible thing! And on such a lovely evening.",
+        "I was by the window, admiring the sunset over the castle grounds.",
+        "The strudel looked absolutely divine from across the room. Such artistry."
       ],
       "followUpLines": [
-        "This is such an unfortunate situation.",
-        "I do hope this gets resolved quickly.",
-        "Being trapped here is rather uncomfortable, don't you think?"
+        "Valentin's been perfecting that recipe for three years, you know.",
+        "I've asked him countless times to share it. He always refuses.",
+        "Some secrets are meant to be shared, don't you think?"
       ],
-      "recordInNotebook": false
+      "recordInNotebook": true,
+      "notebookNote": "Marianne claims she was by the window. Knows Valentin's been perfecting the recipe for 3 years. She's asked for it many times."
     },
     {
       "tier": 1,
       "requiredClues": 1,
       "lines": [
-        "Oh, you found something? How clever of you.",
-        "I suppose we all have our little secrets, don't we?",
-        "I may have been a bit closer to the dessert table than I initially admitted..."
+        "Yes, well... perhaps I wasn't entirely by the window the whole time.",
+        "I may have... gravitated toward the dessert table. To admire the craftsmanship.",
+        "The layering of the pastry! The glaze! It's technique I've been trying to master for years."
       ],
       "followUpLines": [
-        "But that doesn't mean anything!",
-        "I was merely admiring the presentation.",
-        "Valentin has such excellent taste in desserts."
+        "One can learn so much just from observation, you understand.",
+        "I wanted to see how he achieved that perfect golden color.",
+        "Professional curiosity. Nothing more."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Marianne admits she was closer to the dessert table than she first said. Suspicious."
+      "notebookNote": "Marianne admits she approached the table to study Valentin's technique. Recipe obsession or cover story?"
     },
     {
       "tier": 2,
       "requiredClues": 3,
       "lines": [
-        "You're quite persistent, aren't you?",
-        "Very well. I'll share what I know.",
-        "I saw Klaus near the strudel earlier. He seemed... contemplative. Perhaps even critical."
+        "Since you're investigating so thoroughly, I should mention Klaus.",
+        "He and Valentin had a heated discussion about this very recipe last week.",
+        "I overheard Klaus saying the strudel was 'too sweet' and 'needed work.' Valentin was furious."
       ],
       "followUpLines": [
-        "You know about their old rivalry, don't you?",
-        "Klaus has always been competitive with Valentin.",
-        "I'm just suggesting you keep that in mind."
+        "Klaus has always been jealous of Valentin's baking prowess.",
+        "They're friends, yes, but competitive friends. It gets ugly.",
+        "What if Klaus wanted to sabotage it? Or prove it wasn't perfect?"
       ],
       "recordInNotebook": true,
-      "notebookNote": "Marianne saw Klaus near the strudel looking critical. Pointing fingers or being helpful?"
+      "notebookNote": "Marianne reveals Klaus criticized the recipe, causing a fight with Valentin. Professional rivalry as motive?"
     },
     {
       "tier": 3,
       "requiredClues": 5,
       "lines": [
-        "You've discovered everything, haven't you? You're quite thorough.",
-        "I suppose honesty is the best policy now.",
-        "Yes, I took a slice. I couldn't help myself! But there was plenty left when I walked away."
+        "*composing herself* I see you've pieced it all together.",
+        "Yes. I took a piece. I had to understand his technique - the secret ingredient.",
+        "Was it vanilla bean? Orange zest? I needed to know for my own baking!"
       ],
       "followUpLines": [
-        "I've wanted to taste it for so long...",
-        "But I only had one piece! Someone else must have eaten the rest.",
-        "You must believe me. I'm not entirely to blame here."
+        "It was... transcendent. Layers of flavor I couldn't deconstruct.",
+        "But when I took my piece, others had already been there. The strudel was half-gone.",
+        "We're all guilty of indulgence. Some of us were just more honest about our reasons."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Marianne confesses to taking a slice but insists she left plenty. Another partial confession?"
+      "notebookNote": "Marianne confesses to taking a piece for professional analysis. Claims strudel was already half-eaten. Collective guilt confirmed?"
     }
   ]
 }

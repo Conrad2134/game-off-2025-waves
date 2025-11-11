@@ -15,65 +15,66 @@
       "tier": 0,
       "requiredClues": 0,
       "lines": [
-        "This is quite the predicament. Most unseemly.",
-        "I was perusing Valentin's first editions during the... incident.",
-        "I assure you, I saw nothing out of the ordinary."
+        "What an extraordinary overreaction. Though I suppose Valentin has always been... theatrical.",
+        "I was examining his collection of early German poetry. Quite impressive, actually.",
+        "The dessert? I glanced at it earlier. Admirable presentation. Very precise technique."
       ],
       "followUpLines": [
-        "I find this entire situation distasteful.",
-        "Surely we can resolve this like civilized people?",
-        "I have other engagements tonight..."
+        "This lockdown is rather excessive for a missing pastry, don't you think?",
+        "Though I suppose it's valuable to him. Sentimentality and all that.",
+        "I prefer to remain above such... base conflicts."
       ],
-      "recordInNotebook": false
+      "recordInNotebook": true,
+      "notebookNote": "Sebastian was examining poetry books. Noticed the strudel's presentation and technique. Dismissive of Valentin's reaction."
     },
     {
       "tier": 1,
       "requiredClues": 1,
       "lines": [
-        "You're investigating? How... industrious.",
-        "If you must know, I did notice the plate at one point.",
-        "It was oddly pristine, as if someone had cleaned it deliberately."
+        "Ah, you're conducting a proper investigation. How refreshing.",
+        "I observed something curious. The plate was immaculate - no crumbs, no residue.",
+        "Someone with considerable attention to detail cleaned it. Almost compulsively."
       ],
       "followUpLines": [
-        "Perhaps that detail is relevant?",
-        "I'm merely trying to assist.",
-        "The sooner this is over, the better."
+        "That level of cleanliness suggests guilt, wouldn't you say?",
+        "Or perhaps just refined sensibilities. Hard to tell.",
+        "I notice such things. Patterns. Order. Details others miss."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Sebastian noticed the plate was unusually clean. Why mention this specifically?",
+      "notebookNote": "Sebastian noticed the plate was suspiciously clean - compulsively so. He seems proud of his observational skills.",
       "unlocksClues": ["empty-plate"]
     },
     {
       "tier": 2,
       "requiredClues": 3,
       "lines": [
-        "You're making remarkable progress.",
-        "I suppose I should contribute more information.",
-        "I saw Emma lingering near the dessert area. She seemed quite... interested in the strudel."
+        "Your investigative method is quite sound. I can provide additional data.",
+        "Emma exhibited classic guilty behavior - averted gaze, defensive posture.",
+        "She was near the table longer than she admits. I observed her from the fiction section."
       ],
       "followUpLines": [
-        "Take that information as you will.",
-        "I'm merely reporting what I observed.",
-        "Everyone here has been acting suspiciously, if you ask me."
+        "Body language reveals more than words, don't you think?",
+        "She kept glancing at the strudel, then looking away. Fascinating.",
+        "Internal conflict between desire and propriety. Textbook."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Sebastian claims Emma was very interested in the strudel. Everyone's pointing fingers..."
+      "notebookNote": "Sebastian claims Emma showed guilty body language and lingered near the table. Clinical observation or calculated misdirection?"
     },
     {
       "tier": 3,
       "requiredClues": 5,
       "lines": [
-        "I see you've been exceptionally thorough.",
-        "Very well. Complete transparency, then.",
-        "I did sample the strudel. More than a sample, actually. But I left some! I'm certain of it."
+        "*adjusts collar* Very well. I shall confess with precision.",
+        "I consumed approximately 40% of the remaining strudel. I measured it mentally.",
+        "My method was systematic - I cut clean portions, savored each layer, cleaned the plate afterward."
       ],
       "followUpLines": [
-        "It was simply too tempting to resist.",
-        "But I'm not solely responsible for its disappearance.",
-        "Several people took pieces. This is a collective guilt, not individual."
+        "The craftsmanship was exceptional. Each bite revealed new dimensions.",
+        "When I arrived, roughly 30% was already missing. Three distinct cutting patterns.",
+        "This was a crime of collective indulgence. I was simply the most thorough."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Sebastian admits to eating 'more than a sample' but insists others did too. Shared guilt?"
+      "notebookNote": "Sebastian confesses to eating 40% of the strudel with methodical precision. Claims 30% was already gone with three cutting patterns. He's the most detailed culprit."
     }
   ]
 }

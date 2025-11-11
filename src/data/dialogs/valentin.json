@@ -19,64 +19,65 @@
       "tier": 0,
       "requiredClues": 0,
       "lines": [
-        "My erdbeerstrudel! Someone ate it!",
-        "I won't let anyone leave until I find out who did this!",
-        "Please, help me investigate. Look around for any clues."
+        "MEIN ERDBEERSTRUDEL! It's... it's partially eaten!",
+        "Three hours! THREE HOURS I worked on the dough! The perfect strawberries from my garden!",
+        "No one leaves this library until I know who touched my masterpiece!"
       ],
       "followUpLines": [
-        "Have you found anything yet?",
-        "Someone in this room is guilty, I'm certain of it.",
-        "Please, keep searching. There must be evidence somewhere."
+        "Look for evidence! Crumbs, napkins, anything!",
+        "Someone in this room has strawberry on their conscience!",
+        "Interview everyone. Make them confess their sins against pastry!"
       ],
-      "recordInNotebook": false
+      "recordInNotebook": true,
+      "notebookNote": "Valentin discovered his strudel partially eaten. He's distraught and has locked down the library until the culprit is found."
     },
     {
       "tier": 1,
       "requiredClues": 1,
       "lines": [
-        "You found something? Let me see...",
-        "Interesting... This could be important.",
-        "Keep investigating. Every clue brings us closer to the truth."
+        "Ah! You found evidence! Gut, gut!",
+        "This is like putting together a jigsaw puzzle of betrayal.",
+        "Keep searching. Every crumb tells a story, ja?"
       ],
       "followUpLines": [
-        "Any new discoveries?",
-        "The evidence is mounting...",
-        "Have you talked to everyone? Someone knows more than they're saying."
+        "Talk to everyone. Someone knows something!",
+        "My beautiful creation... why would they do this?",
+        "The truth is close. I can feel it in my baker's bones!"
       ],
       "recordInNotebook": true,
-      "notebookNote": "Valentin is genuinely upset about the missing strudel. He's counting on me to find the culprit."
+      "notebookNote": "Valentin is emotionally invested but wants justice. He's depending on me to solve this."
     },
     {
       "tier": 2,
       "requiredClues": 3,
       "lines": [
-        "Three clues already? You're quite the detective!",
-        "I remember seeing someone near that napkin earlier...",
-        "But I can't quite place who it was. Maybe if you find more evidence?"
+        "Three clues! You are like Sherlock Holmes but for German pastries!",
+        "I am starting to see the pattern... multiple people near my strudel...",
+        "Mein Gott... was it... was it more than one person?"
       ],
       "followUpLines": [
-        "The pieces are coming together, aren't they?",
-        "Someone's story doesn't add up. I can feel it.",
-        "Keep pressing. The truth will reveal itself."
+        "Could they have conspired? Or each acted alone?",
+        "The betrayal runs deeper than I thought...",
+        "Find more evidence. I need to know everyone who touched it!"
       ],
       "recordInNotebook": true,
-      "notebookNote": "Valentin saw someone near the napkin but can't remember who. His memory seems selective."
+      "notebookNote": "Valentin is realizing multiple people might be involved. His world is crumbling."
     },
     {
       "tier": 3,
       "requiredClues": 5,
       "lines": [
-        "Five clues! You've been thorough.",
-        "I... I think I know who did it now.",
-        "But I want to hear your conclusion first. Who do you believe ate my erdbeerstrudel?"
+        "Five clues... Das ist... this is comprehensive.",
+        "I invited these people into my home. My FRIENDS. And they...",
+        "I think I understand now. It was all of them, wasn't it? Working together? Or... independently but simultaneously?"
       ],
       "followUpLines": [
-        "Take your time. Review all the evidence.",
-        "When you're ready, make your accusation.",
-        "Choose carefully. There's only one guilty party here."
+        "I need you to confront them. Find out the full truth.",
+        "Who took the first bite? Who took the most? I must know!",
+        "My heart is breaking, but my mind demands answers!"
       ],
       "recordInNotebook": true,
-      "notebookNote": "Valentin claims to know the culprit but wants me to solve it myself. Testing me?"
+      "notebookNote": "Valentin suspects collective guilt. He wants confrontation and full confessions from everyone involved."
     }
   ]
 }

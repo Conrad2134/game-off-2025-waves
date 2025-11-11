@@ -126,12 +126,14 @@ export class DialogManager {
     if (sourceType === 'npc' && this.progressionManager) {
       const phase = this.progressionManager.getCurrentPhase();
       const tier = this.progressionManager.getDialogTier();
+      
+      // Check count BEFORE selecting dialog
+      const countBefore = this.progressionManager.getConversationCount(sourceId, tier);
+      console.log(`[Dialog.open] ${sourceId} - Count BEFORE selectDialog: ${countBefore}`);
+      
       messageData = this.selectDialog(sourceId, phase, tier);
       this.currentNPCId = sourceId;
       this.currentTier = tier;
-      
-      // Record conversation for follow-up tracking
-      this.progressionManager.recordConversation(sourceId, tier);
     }
 
     const message = this.createMessage(messageData, sourceType, sourceId, speakerName);
@@ -143,6 +145,21 @@ export class DialogManager {
     // Record in notebook if marked
     if (this.notebookManager && message.recordInNotebook) {
       this.notebookManager.recordDialog(message);
+    }
+
+    // Record conversation AFTER showing dialog (for accurate follow-up tracking)
+    // ONLY record conversations during post-incident phase (not introductions)
+    if (sourceType === 'npc' && this.progressionManager && this.currentNPCId) {
+      const phase = this.progressionManager.getCurrentPhase();
+      if (phase === 'post-incident') {
+        const countBefore = this.progressionManager.getConversationCount(this.currentNPCId, this.currentTier);
+        console.log(`[Dialog.open] ${this.currentNPCId} - Count BEFORE recordConversation: ${countBefore}`);
+        this.progressionManager.recordConversation(this.currentNPCId, this.currentTier);
+        const countAfter = this.progressionManager.getConversationCount(this.currentNPCId, this.currentTier);
+        console.log(`[Dialog.open] ${this.currentNPCId} - Count AFTER recordConversation: ${countAfter}`);
+      } else {
+        console.log(`[Dialog.open] ${this.currentNPCId} - Skipping recordConversation (pre-incident introduction)`);
+      }
     }
 
     // Store active entity and pause NPC movement if applicable
@@ -334,6 +351,7 @@ export class DialogManager {
 
     if (phase === 'pre-incident') {
       // Return introduction dialog
+      console.log(`[Dialog] ${characterId} - Phase: ${phase} - Showing introduction`);
       return {
         lines: charData.introduction.lines,
         recordInNotebook: charData.introduction.recordInNotebook,
@@ -349,8 +367,12 @@ export class DialogManager {
       const tierData = charData.postIncident[tier];
       const conversationCount = this.progressionManager?.getConversationCount(characterId, tier) ?? 0;
 
+      // Debug output
+      console.log(`[Dialog] ${characterId} - Phase: ${phase}, Tier: ${tier}, ConversationCount: ${conversationCount}`);
+
       // First conversation at this tier: use initial lines
       if (conversationCount === 0) {
+        console.log(`[Dialog] ${characterId} - Showing INITIAL lines (recordInNotebook: ${tierData.recordInNotebook})`);
         return {
           lines: tierData.lines,
           recordInNotebook: tierData.recordInNotebook,
@@ -359,6 +381,7 @@ export class DialogManager {
       } else {
         // Follow-up conversation: cycle through follow-up lines
         const index = (conversationCount - 1) % tierData.followUpLines.length;
+        console.log(`[Dialog] ${characterId} - Showing FOLLOW-UP line ${index + 1}/${tierData.followUpLines.length}`);
         return {
           lines: [tierData.followUpLines[index]],
           recordInNotebook: false, // Don't record follow-ups

@@ -87,13 +87,27 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
     this.initialized = true;
     console.log(`✓ GameProgressionManager initialized (phase: ${this.currentPhase})`);
     
-    // Expose reset method to window for debugging
+    // Expose debug methods to window
     if (typeof window !== 'undefined') {
       (window as any).resetGame = () => {
         this.reset();
         console.log('🔄 Game reset! Reload the page to start fresh.');
       };
-      console.log('💡 Debug: Use window.resetGame() to clear save data');
+      (window as any).showConversations = () => {
+        console.log('� Conversation History:');
+        if (this.conversationHistory.size === 0) {
+          console.log('  (no conversations recorded)');
+        } else {
+          this.conversationHistory.forEach((tierMap, npcId) => {
+            console.log(`  ${npcId}:`);
+            tierMap.forEach((count, tier) => {
+              console.log(`    Tier ${tier}: ${count} conversation(s)`);
+            });
+          });
+        }
+      };
+      console.log('�💡 Debug: Use window.resetGame() to clear save data');
+      console.log('💡 Debug: Use window.showConversations() to view conversation counts');
     }
   }
 
@@ -287,6 +301,10 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
    * Record a conversation with an NPC at a specific tier
    */
   recordConversation(npcId: string, tier: number): void {
+    // Debug: Log stack trace to see where this is being called from
+    console.log(`[ProgressionManager.recordConversation] ${npcId}, tier ${tier}`);
+    console.trace('Stack trace:');
+    
     if (!this.conversationHistory.has(npcId)) {
       this.conversationHistory.set(npcId, new Map());
     }
@@ -296,6 +314,7 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
     const newCount = currentCount + 1;
     tierMap.set(tier, newCount);
 
+    console.log(`[ProgressionManager.recordConversation] ${npcId} tier ${tier}: ${currentCount} → ${newCount}`);
     this.emit('conversation-recorded', { npcId, tier, count: newCount });
     this.debouncedSave();
   }

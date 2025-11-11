@@ -15,65 +15,66 @@
       "tier": 0,
       "requiredClues": 0,
       "lines": [
-        "This is terrible! Who would do such a thing?",
-        "I was near the bookshelf when Valentin left for the kitchen.",
-        "I didn't see anyone go near the strudel, I swear!"
+        "This is absolutely dreadful! Valentin worked so hard on that strudel.",
+        "I was by the bookshelf admiring his collection when he stepped out.",
+        "I... I noticed the plate from across the room. It looked so beautiful with those strawberries on top."
       ],
       "followUpLines": [
-        "I really didn't see anything suspicious.",
-        "Maybe someone from the other side of the room?",
-        "This is so awkward... I just wanted to enjoy the party."
+        "I'm not usually one to watch desserts, but it was calling to me.",
+        "Several people were moving around. It's hard to say who was where.",
+        "Maybe check the area around the dessert table for evidence?"
       ],
-      "recordInNotebook": false
+      "recordInNotebook": true,
+      "notebookNote": "Emma was by the bookshelf during the incident. Noticed the strudel from across the room - admits it was calling to her."
     },
     {
       "tier": 1,
       "requiredClues": 1,
       "lines": [
-        "You found something? What is it?",
-        "Oh... well, I suppose everyone was moving around a lot.",
-        "Have you checked Valentin's desk? He keeps all sorts of papers there."
+        "You found crumbs? Well, yes, I suppose that makes sense...",
+        "I did notice someone wiping their hands on a napkin. Very deliberately.",
+        "Oh! Valentin has recipe notes on his desk. I saw him scribbling on them earlier with... strong opinions."
       ],
       "followUpLines": [
-        "Did you look at the desk yet?",
-        "I'm sure it wasn't me... right?",
-        "This whole situation is making me nervous."
+        "The desk might tell you who had issues with the recipe.",
+        "I'm just trying to be helpful. I didn't do anything wrong!",
+        "Whoever ate it must have left more evidence than just crumbs..."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Emma suggested checking Valentin's desk. Why would she know about papers there?",
+      "notebookNote": "Emma saw someone wiping their hands deliberately. She also knows about Valentin's recipe notes - has she been snooping?",
       "unlocksClues": ["desk-papers"]
     },
     {
       "tier": 2,
       "requiredClues": 3,
       "lines": [
-        "You're really getting close to solving this, aren't you?",
-        "I... I have to admit something.",
-        "I wasn't entirely honest before. I did see someone near the dessert table, but I don't want to accuse anyone without proof."
+        "Alright, fine. I'll tell you what I really saw.",
+        "Luca was near the dessert table. He had this... guilty look. Furtive.",
+        "And I heard him mutter something about 'finally trying the legendary strudel.' That's suspicious, right?"
       ],
       "followUpLines": [
-        "It's hard to know who to trust right now.",
-        "Everyone seems suspicious when you look closely enough.",
-        "I hope this gets resolved soon. The tension is unbearable."
+        "He's new here. Maybe he didn't understand how sacred Valentin's baking is?",
+        "I didn't want to throw him under the carriage, but you need to know.",
+        "Check behind the bookshelf. I saw him glance that direction nervously."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Emma admits she saw someone near the dessert table but won't say who. Protecting someone?"
+      "notebookNote": "Emma claims Luca was near the table acting suspiciously and muttered about trying the strudel. Reliable witness or deflecting blame?"
     },
     {
       "tier": 3,
       "requiredClues": 5,
       "lines": [
-        "You've found everything, haven't you?",
-        "I suppose there's no point hiding it anymore.",
-        "The person I saw... was Luca. But please, don't tell him I told you!"
+        "*sighs* I need to come completely clean.",
+        "I was... tempted. Very tempted. I stood by the table for a moment, inhaling the aroma.",
+        "But I didn't touch it! When I was there, I noticed the plate was already disturbed. Someone beat me to it."
       ],
       "followUpLines": [
-        "I shouldn't have said anything...",
-        "What if I'm wrong? What if it wasn't Luca?",
-        "Please be discreet with this information."
+        "I saw powdered sugar on someone's sleeve, but I can't remember whose...",
+        "Multiple people were near that table at different times.",
+        "I wanted it so badly, but I respected Valentin's wishes. Not everyone did."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Emma finally admits she saw Luca near the dessert table. Is she telling the truth or deflecting?"
+      "notebookNote": "Emma admits she was tempted and approached the table, but claims it was already disturbed. Partial truth or full confession?"
     }
   ]
 }

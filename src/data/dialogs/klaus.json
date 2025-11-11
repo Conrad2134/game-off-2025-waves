@@ -15,64 +15,65 @@
       "tier": 0,
       "requiredClues": 0,
       "lines": [
-        "I can't believe this happened! Poor Valentin...",
-        "I was admiring his book collection when the strudel went missing.",
-        "This is absolutely outrageous. We need to find the culprit!"
+        "Mein Gott, what a disaster! Valentin is beside himself.",
+        "I was examining his first edition Goethe when I heard the commotion.",
+        "In all my years knowing him, I've never seen him so... unhinged over pastry."
       ],
       "followUpLines": [
-        "Have you made any progress?",
-        "As Valentin's friend, I want justice!",
-        "Someone here is lying, I'm sure of it."
+        "Valentin always was dramatic about his baking. It's part of his charm.",
+        "We must find who did this. For his peace of mind.",
+        "Though between you and me, he's been obsessive about this recipe lately..."
       ],
-      "recordInNotebook": false
+      "recordInNotebook": true,
+      "notebookNote": "Klaus was reading when the incident happened. Notes Valentin's been obsessive about the recipe lately."
     },
     {
       "tier": 1,
       "requiredClues": 1,
       "lines": [
-        "You're investigating? Good, good.",
-        "I must confess, Valentin's recipes haven't always been... perfect.",
-        "We used to critique each other's cooking back in university. Sometimes quite harshly."
+        "Ah, you found evidence already. How... thorough.",
+        "I should mention - Valentin showed me the recipe last week. Asked for my opinion.",
+        "I told him the strawberry ratio was off. Too sweet. He didn't take it well."
       ],
       "followUpLines": [
-        "But that was years ago! I'd never sabotage his work now.",
-        "We've moved past those petty competitions.",
-        "...Haven't we?"
+        "He scribbled angry notes all over the recipe after our talk.",
+        "We've been culinary rivals since university. All in good fun... mostly.",
+        "But I would never stoop to eating his work just to prove a point!"
       ],
       "recordInNotebook": true,
-      "notebookNote": "Klaus and Valentin used to critique each other's cooking harshly. Old rivalry?"
+      "notebookNote": "Klaus criticized Valentin's strudel recipe for being too sweet, which upset Valentin. Old rivalry runs deep."
     },
     {
       "tier": 2,
       "requiredClues": 3,
       "lines": [
-        "You're proving quite thorough in your investigation.",
-        "I respect that. Truth should always come to light.",
-        "Between you and me, I think Sebastian was acting strangely earlier. Very nervous."
+        "You're quite the detective. Impressive work so far.",
+        "Since we're being thorough - Sebastian was hovering near the dessert table.",
+        "I saw him inspect the plate very carefully. Almost clinically. Then he walked away quickly."
       ],
       "followUpLines": [
-        "Just an observation, mind you.",
-        "I'm not one to spread rumors without evidence.",
-        "But you might want to press him a bit harder."
+        "He had this satisfied look afterward. A bit too satisfied.",
+        "Sebastian always acts refined, but everyone has their weaknesses.",
+        "The plate was suspiciously clean when I glanced at it later..."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Klaus thinks Sebastian was acting nervous. Genuine observation or misdirection?"
+      "notebookNote": "Klaus saw Sebastian hovering near the dessert table, inspecting the plate carefully, then leaving with a satisfied look."
     },
     {
       "tier": 3,
       "requiredClues": 5,
       "lines": [
-        "You've uncovered everything, haven't you?",
-        "I suppose I should be honest now.",
-        "I did taste a small piece when Valentin wasn't looking. But I didn't eat the whole thing! Someone else must have finished it."
+        "*long pause* Very well. I'll admit the truth.",
+        "I... took a small piece. Just to verify my critique was correct.",
+        "And... damn him... it was perfect. He'd fixed the sweetness. It was absolutely perfect."
       ],
       "followUpLines": [
-        "It was just a tiny sample! For old time's sake.",
-        "You believe me, don't you?",
-        "I know how it looks, but I'm not the main culprit here."
+        "Professional jealousy is an ugly thing, my friend.",
+        "But I only took a small piece! The rest was already missing when I approached.",
+        "It seems several of us couldn't resist. This is a collective crime."
       ],
       "recordInNotebook": true,
-      "notebookNote": "Klaus admits to tasting the strudel but denies eating all of it. Partial truth?"
+      "notebookNote": "Klaus confesses to taking a piece out of professional jealousy to verify his critique. Admits it was perfect. Multiple people involved?"
     }
   ]
 }
