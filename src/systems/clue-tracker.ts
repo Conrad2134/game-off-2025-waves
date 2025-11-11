@@ -26,6 +26,8 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
   private pulseTime: number = 0;
   private initialized: boolean = false;
   private saveManager: SaveManager | null = null;
+  private progressionManager: any | null = null;
+  private cluesEnabled: boolean = false;
 
   constructor(config: ClueTrackerConfig) {
     super();
@@ -48,6 +50,24 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
     if (this.initialized) {
       console.warn('ClueTracker already initialized');
       return;
+    }
+
+    // Get progression manager reference
+    this.progressionManager = this.scene.registry.get('progressionManager');
+    if (this.progressionManager) {
+      const currentPhase = this.progressionManager.getCurrentPhase();
+      const config = this.progressionManager.getConfig();
+      this.cluesEnabled = config?.phases[currentPhase]?.cluesEnabled ?? false;
+      
+      // Listen for phase changes
+      this.progressionManager.on('phase-changed', (data: { phase: string }) => {
+        const phaseConfig = config?.phases[data.phase];
+        this.cluesEnabled = phaseConfig?.cluesEnabled ?? false;
+        this.updateAllClueVisibility();
+        console.log(`✓ ClueTracker: Phase ${data.phase} - clues ${this.cluesEnabled ? 'enabled' : 'disabled'}`);
+      });
+    } else {
+      console.warn('[ClueTracker] No progression manager found!');
     }
 
     // Load clues from JSON
@@ -114,6 +134,10 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
 
     sprite.setDepth(2); // Below NPCs, above floor
     sprite.setOrigin(0.5, 0.5);
+    
+    // Make sprite non-interactive by default (will be enabled when clues are enabled)
+    sprite.setInteractive({ useHandCursor: false });
+    sprite.disableInteractive();
 
     clue.sprite = sprite;
     this.clueSprites.add(sprite);
@@ -127,6 +151,14 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
    */
   private updateClueVisual(clue: ClueData): void {
     if (!clue.sprite) return;
+
+    // Hide clues if not enabled (pre-incident phase)
+    if (!this.cluesEnabled) {
+      clue.sprite.setVisible(false);
+      return;
+    }
+
+    clue.sprite.setVisible(true);
 
     switch (clue.state) {
       case 'locked':
@@ -256,8 +288,16 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
    * Check if a clue can be interacted with
    */
   canInteract(clueId: string): boolean {
-    const clue = this.clues.get(clueId);
-    return clue ? clue.state === 'unlocked' : false;
+    return this.cluesEnabled && this.clues.get(clueId)?.state === 'unlocked';
+  }
+
+  /**
+   * Update visibility for all clues based on current phase
+   */
+  private updateAllClueVisibility(): void {
+    this.clues.forEach(clue => {
+      this.updateClueVisual(clue);
+    });
   }
 
   /**

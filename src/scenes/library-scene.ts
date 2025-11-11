@@ -833,6 +833,15 @@ export class LibraryScene extends Phaser.Scene {
     });
     this.clueTracker.initialize();
 
+    // Disable interactable objects if in pre-incident phase
+    const currentPhase = this.progressionManager.getCurrentPhase();
+    if (currentPhase === 'pre-incident') {
+      this.interactableObjects.forEach(obj => {
+        obj.setInteractable(false);
+      });
+      console.log(`✓ Interactable objects disabled (pre-incident phase)`);
+    }
+
     console.log('✓ Progression system initialized');
   }
   
@@ -928,6 +937,11 @@ export class LibraryScene extends Phaser.Scene {
           if (clue.initiallyUnlocked) {
             this.clueTracker.unlockClue(clue.id);
           }
+        });
+        
+        // Enable interactable objects (they're clues too)
+        this.interactableObjects.forEach(obj => {
+          obj.setInteractable(true);
         });
       }
     });

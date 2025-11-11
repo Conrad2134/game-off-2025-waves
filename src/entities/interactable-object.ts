@@ -25,7 +25,7 @@ export class InteractableObject extends Phaser.GameObjects.Sprite implements Int
   // Interactable interface properties
   public readonly id: string;
   public readonly interactionRange: number;
-  public readonly interactable: boolean = true;
+  public interactable: boolean = true;
   public readonly dialogData: DialogData;
 
   constructor(config: InteractableObjectConfig) {
@@ -74,5 +74,12 @@ export class InteractableObject extends Phaser.GameObjects.Sprite implements Int
    */
   public getDescription(): string {
     return this.dialogData.description ?? 'Nothing special about this.';
+  }
+
+  /**
+   * Set whether this object can be interacted with
+   */
+  public setInteractable(value: boolean): void {
+    this.interactable = value;
   }
 }
