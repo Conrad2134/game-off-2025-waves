@@ -193,15 +193,36 @@ export class SaveManager extends Phaser.Events.EventEmitter {
     saveData.npcs.forEach(npcState => {
       const npc = this.npcs!.find(n => n.id === npcState.id);
       if (npc) {
-        npc.setPosition(npcState.x, npcState.y);
-        // Note: Direction restoration would require adding a setDirection method to NPCCharacter
-        
-        // If this is Valentin and incident has happened, keep him paused at the door
+        // If this is Valentin and incident has happened, place him at the door
         if (npc.id === 'valentin' && saveData.hasPlayedIncident) {
+          // Always position Valentin at the door post-incident (from progression config)
+          const doorX = 600;
+          const doorY = 100;
+          npc.setPosition(doorX, doorY);
+          
+          // Face south (looking at the room)
+          if (typeof (npc as any).faceTowards === 'function') {
+            (npc as any).faceTowards(doorX, doorY + 100);
+          }
+          
+          // Set this as his home position with zero wander radius
+          if (typeof (npc as any).setHomePosition === 'function') {
+            (npc as any).setHomePosition(doorX, doorY);
+          }
+          
+          // Set wander radius to 0 so he won't move even if resumed
+          if ('wanderRadius' in npc) {
+            (npc as any).wanderRadius = 0;
+          }
+          
           if (typeof npc.pauseMovement === 'function') {
             npc.pauseMovement();
-            console.log('[SaveManager] Valentin kept paused at door (incident played)');
+            console.log('[SaveManager] Valentin positioned at door (wanderRadius: 0, paused, incident played)');
           }
+        } else {
+          // For all other NPCs, restore their saved position
+          npc.setPosition(npcState.x, npcState.y);
+          // Note: Direction restoration would require adding a setDirection method to NPCCharacter
         }
       }
     });

@@ -265,6 +265,12 @@ export class LibraryScene extends Phaser.Scene {
       if (this.hasPlayedOpeningScene || currentPhase !== 'pre-incident') {
         console.log('[Opening Scene] Unpausing all NPCs for normal gameplay');
         this.npcs.forEach(npc => {
+          // Don't resume Valentin if we're post-incident (he should be guarding the door)
+          if (npc.id === 'valentin' && currentPhase === 'post-incident') {
+            console.log('[Opening Scene] Skipping Valentin (guarding door post-incident)');
+            return;
+          }
+          
           if (typeof npc.resumeMovement === 'function') {
             npc.resumeMovement();
           }
@@ -1337,7 +1343,12 @@ export class LibraryScene extends Phaser.Scene {
     this.player.unlockMovement();
     console.log('[Opening Scene] ✅ Player movement unlocked');
 
-    // Resume all NPCs (except Valentin who is off-screen)
+    // Check if we're in post-incident phase
+    const currentPhase = this.progressionManager.getCurrentPhase();
+    const isPostIncident = currentPhase === 'post-incident';
+    console.log(`[Opening Scene] Current phase: ${currentPhase}, isPostIncident: ${isPostIncident}`);
+
+    // Resume all NPCs (except Valentin who is either off-screen or guarding the door)
     this.npcs.forEach((npc, index) => {
       console.log(`[Opening Scene] Processing NPC ${index + 1}/${this.npcs.length}: ${npc.id}`);
       if (npc.id !== 'valentin') {
