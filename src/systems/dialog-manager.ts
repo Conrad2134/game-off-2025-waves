@@ -3,6 +3,7 @@ import type { DialogManagerConfig, DialogMessage, DialogData, DialogTier } from 
 import type { DialogBox } from '../components/dialog-box';
 import type { NotebookManager } from './notebook-manager';
 import type { GameProgressionManager } from './game-progression-manager';
+import type { SaveManager } from './save-manager';
 import type { CharacterDialogData, GamePhase } from '../types/progression';
 import { validateCharacterDialogData, logValidationResult } from '../utils/validation';
 
@@ -25,6 +26,7 @@ export class DialogManager {
   private activeEntity: any | null = null; // The entity currently in conversation
   private notebookManager: NotebookManager | null = null;
   private progressionManager: GameProgressionManager | null = null;
+  private saveManager: SaveManager | null = null;
   private dialogCache: Map<string, CharacterDialogData> = new Map();
   private currentNPCId: string | null = null;
   private currentTier: number = 0;
@@ -61,12 +63,18 @@ export class DialogManager {
   public setNotebookManager(notebookManager: NotebookManager): void {
     this.notebookManager = notebookManager;
   }
-
   /**
    * Set the progression manager for phase-based dialog selection
    */
   public setProgressionManager(manager: GameProgressionManager): void {
     this.progressionManager = manager;
+  }
+
+  /**
+   * Set the save manager for auto-saving after conversations
+   */
+  public setSaveManager(manager: SaveManager): void {
+    this.saveManager = manager;
   }
 
   /**
@@ -148,7 +156,6 @@ export class DialogManager {
       }
     }
   }
-
   /**
    * Close the current dialog
    */
@@ -165,6 +172,11 @@ export class DialogManager {
     // Emit dialog-closed event for progression tracking
     if (this.currentNPCId) {
       this.scene.events.emit('dialog-closed', { sourceId: this.currentNPCId });
+      
+      // Auto-save after conversation
+      if (this.saveManager) {
+        this.saveManager.autoSave();
+      }
     }
 
     this.dialogBox.hide();

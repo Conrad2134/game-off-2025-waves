@@ -9,6 +9,7 @@ import { NotebookManager } from '../systems/notebook-manager';
 import { NotebookUI } from '../components/notebook-ui';
 import { GameProgressionManager } from '../systems/game-progression-manager';
 import { ClueTracker } from '../systems/clue-tracker';
+import { SaveManager } from '../systems/save-manager';
 import type {
   LibraryLayoutConfig,
   FurnitureConfig,
@@ -50,10 +51,12 @@ export class LibraryScene extends Phaser.Scene {
   private notebookManager!: NotebookManager;
   private notebookUI!: NotebookUI;
   private notebookKey!: Phaser.Input.Keyboard.Key;
-  
   // Progression system
   private progressionManager!: GameProgressionManager;
   private clueTracker!: ClueTracker;
+  
+  // Save system
+  private saveManager!: SaveManager;
   
   // Opening scene
   private npcRoamingPositions: Map<string, { x: number; y: number }> = new Map();
@@ -178,9 +181,7 @@ export class LibraryScene extends Phaser.Scene {
       this.sceneLayout.worldSize.height
     );
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-    this.cameras.main.setZoom(1.0);
-    this.cameras.main.setRoundPixels(true); // Pixel-perfect rendering
-
+    
     // Initialize progression system FIRST (before dialog system)
     this.initializeProgressionSystem();
 
@@ -189,6 +190,9 @@ export class LibraryScene extends Phaser.Scene {
 
     // Initialize notebook system
     this.initializeNotebookSystem();
+    
+    // Initialize save system AFTER all other systems are ready
+    this.initializeSaveSystem();
     
     // Link all systems together
     this.linkSystems();
@@ -827,12 +831,55 @@ export class LibraryScene extends Phaser.Scene {
   }
   
   /**
+   * Initialize save system
+  /**
+   * Initialize save system
+   */
+  private initializeSaveSystem(): void {
+    // Create SaveManager
+    this.saveManager = new SaveManager({
+      scene: this,
+      storageKey: 'erdbeerstrudel-save',
+      saveDebounceMs: 1000,
+    });
+    
+    // Initialize with references to other systems
+    this.saveManager.initialize(
+      this.player,
+      this.npcs,
+      this.progressionManager,
+      this.notebookManager
+    );
+
+    // Load saved game if exists
+    const savedGame = this.saveManager.loadGame();
+    if (savedGame) {
+      console.log('📂 Restoring game state from save...');
+      this.saveManager.restoreGameState(savedGame);
+      this.hasPlayedOpeningScene = savedGame.hasPlayedOpeningScene;
+      
+      // Restore clue states
+      this.clueTracker.restoreState(savedGame.unlockedClues, savedGame.discoveredClues);
+      
+      // Restore notebook entries
+      this.restoreNotebookEntries(savedGame);
+    }
+
+    console.log('✓ Save system initialized');
+  }
+
+  /**
    * Link all systems together with necessary references
    */
   private linkSystems(): void {
     // Link progression manager to dialog manager
     this.dialogManager.setProgressionManager(this.progressionManager);
     this.dialogManager.loadCharacterDialogs();
+
+    // Link save manager to all systems
+    this.progressionManager.setSaveManager(this.saveManager);
+    this.dialogManager.setSaveManager(this.saveManager);
+    this.clueTracker.setSaveManager(this.saveManager);
 
     // Link clue tracker to notebook manager
     this.clueTracker.on('clue-discovered', (data: { clueId: string; clue: any }) => {
@@ -1139,6 +1186,11 @@ export class LibraryScene extends Phaser.Scene {
     this.isOpeningSceneActive = true;
     console.log('🎬 Playing opening scene');
 
+    // Mark opening scene as played in save system
+    if (this.saveManager) {
+      this.saveManager.markOpeningScenePlayed();
+    }
+
     // Lock player movement
     this.player.lockMovement();
 
@@ -1326,6 +1378,23 @@ export class LibraryScene extends Phaser.Scene {
       }
     });
     console.log('✅ ===== END OPENING SCENE COMPLETE =====');
+  }
+
+  /**
+   * Restore notebook entries from saved game
+   */
+  private restoreNotebookEntries(savedGame: any): void {
+    if (!savedGame.notebookEntries || savedGame.notebookEntries.length === 0) {
+      console.log('No notebook entries to restore');
+      return;
+    }
+
+    console.log(`Restoring ${savedGame.notebookEntries.length} notebook entries...`);
+    savedGame.notebookEntries.forEach((entry: any) => {
+      this.notebookManager.addEntry(entry);
+    });
+    
+    console.log('✓ Notebook entries restored');
   }
 
   /**

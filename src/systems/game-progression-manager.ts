@@ -16,6 +16,7 @@ import type {
   ProgressionSaveData,
   ProgressionConfig,
 } from '../types/progression';
+import type { SaveManager } from './save-manager';
 import {
   validateProgressionConfig,
   logValidationResult,
@@ -50,6 +51,7 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
   private config: ProgressionConfig | null = null;
   private saveDebounceTimer: Phaser.Time.TimerEvent | null = null;
   private initialized: boolean = false;
+  private saveManager: SaveManager | null = null;
 
   constructor(config: GameProgressionManagerConfig) {
     super();
@@ -58,7 +60,6 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
     this.storageKey = config.storageKey ?? 'erdbeerstrudel-progression';
     this.saveDebounceMs = config.saveDebounceMs ?? 2000;
   }
-
   /**
    * Initialize the manager, load saved state if available
    */
@@ -94,6 +95,13 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
       };
       console.log('💡 Debug: Use window.resetGame() to clear save data');
     }
+  }
+
+  /**
+   * Set the save manager for coordinated saving
+   */
+  public setSaveManager(manager: SaveManager): void {
+    this.saveManager = manager;
   }
 
   /**
@@ -231,7 +239,13 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
     this.emit('incident-triggered', { timestamp: Date.now() });
 
     console.log('✨ Incident triggered! Phase changed to post-incident');
-    this.save(); // Immediate save on phase transition
+    
+    // Immediate save on phase transition (use both systems)
+    this.save();
+    if (this.saveManager) {
+      this.saveManager.markIncidentPlayed();
+      this.saveManager.saveGame();
+    }
   }
 
   /**
@@ -373,7 +387,7 @@ export class GameProgressionManager extends Phaser.Events.EventEmitter {
   /**
    * Migrate save data from older versions
    */
-  private migrateData(data: any): ProgressionSaveData | null {
+  private migrateData(_data: any): ProgressionSaveData | null {
     console.warn('No migration path available, starting fresh');
     return null;
   }

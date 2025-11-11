@@ -7,6 +7,7 @@
 
 import Phaser from 'phaser';
 import type { ClueData, ClueState, CluesConfig } from '../types/clue';
+import type { SaveManager } from './save-manager';
 import { validateCluesConfig, logValidationResult } from '../utils/validation';
 
 export interface ClueTrackerConfig {
@@ -24,12 +25,20 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
   private clueSprites: Phaser.GameObjects.Group;
   private pulseTime: number = 0;
   private initialized: boolean = false;
+  private saveManager: SaveManager | null = null;
 
   constructor(config: ClueTrackerConfig) {
     super();
     this.scene = config.scene;
     this.registryKey = config.registryKey ?? 'clueTracker';
     this.clueSprites = this.scene.add.group();
+  }
+
+  /**
+   * Set the save manager for auto-saving after clue discoveries
+   */
+  public setSaveManager(manager: SaveManager): void {
+    this.saveManager = manager;
   }
 
   /**
@@ -233,6 +242,11 @@ export class ClueTracker extends Phaser.Events.EventEmitter {
     const progressionManager = this.scene.registry.get('progressionManager');
     if (progressionManager && typeof progressionManager.notifyClueDiscovered === 'function') {
       progressionManager.notifyClueDiscovered(clueId);
+    }
+
+    // Auto-save after clue discovery
+    if (this.saveManager) {
+      this.saveManager.autoSave();
     }
 
     console.log(`🔍 Clue discovered: ${clue.name}`);

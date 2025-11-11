@@ -36,6 +36,9 @@ export class StartScene extends Phaser.Scene {
     this.createBackground(width, height);
     this.createDecorations(width, height);
 
+    // Check for saved game
+    const hasSave = this.checkForSavedGame();
+
     this.titleText = this.add.text(width / 2, height * 0.25, "Who Ate Valentin's\nErdbeerstrudel?", {
       fontSize: '42px',
       fontFamily: 'monospace',
@@ -54,7 +57,9 @@ export class StartScene extends Phaser.Scene {
     buttonBg.setScrollFactor(0);
     this.decorations.push(buttonBg);
 
-    this.startButton = this.add.text(width / 2, height * 0.6, 'Start Game', {
+    // Show "Resume Game" if save exists, otherwise "Start Game"
+    const buttonText = hasSave ? 'Resume Game' : 'Start Game';
+    this.startButton = this.add.text(width / 2, height * 0.6, buttonText, {
       fontSize: '28px',
       fontFamily: 'monospace',
       color: '#d4af37',
@@ -269,7 +274,23 @@ export class StartScene extends Phaser.Scene {
       this.resetButton.setFontSize('28px'); // Back to original size
       this.resetButton.setColor('#b8941f');
       this.resetButton.setInteractive({ useHandCursor: true });
+      
+      // Update start button text since save is cleared
+      this.startButton.setText('Start Game');
     });
+  }
+
+  /**
+   * Check if a saved game exists
+   */
+  private checkForSavedGame(): boolean {
+    try {
+      const save = localStorage.getItem('erdbeerstrudel-save');
+      return save !== null;
+    } catch (error) {
+      console.error('Failed to check for saved game:', error);
+      return false;
+    }
   }
 
   shutdown(): void {
