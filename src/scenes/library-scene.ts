@@ -893,59 +893,122 @@ export class LibraryScene extends Phaser.Scene {
 
     // Lock player movement
     this.player.lockMovement();
-
-    // Find Valentin and move him to entry position
-    const valentin = this.npcs.find(npc => npc.id === 'valentin');
-    if (valentin) {
-      // Make Valentin visible again and restore alpha
-      valentin.setVisible(true);
-      valentin.setAlpha(1);
-      
-      // Re-register with interaction detector
-      this.interactionDetector.registerInteractable(valentin);
-      console.log('[Incident] Valentin re-registered as interactable');
-      
-      valentin.setPosition(cutscene.entryPosition.x, cutscene.entryPosition.y);
-      if (typeof valentin.pauseMovement === 'function') {
-        valentin.pauseMovement();
+    
+    // Pause all NPCs during cutscene
+    this.npcs.forEach(npc => {
+      if (npc.id !== 'valentin' && typeof npc.pauseMovement === 'function') {
+        npc.pauseMovement();
       }
+    });
+
+    // Find Valentin
+    const valentin = this.npcs.find(npc => npc.id === 'valentin');
+    if (!valentin) {
+      console.error('[Incident] Valentin not found!');
+      this.player.unlockMovement();
+      return;
     }
 
-    // Show Valentin's speech
-    this.dialogBox.show({
-      speaker: 'Valentin',
-      message: cutscene.speechLines.join('\n\n'),
-      type: 'npc',
-      characterId: 'valentin',
-      objectId: null,
-      recordInNotebook: true,
-      notebookNote: "Valentin's erdbeerstrudel has been eaten! He's locked the door!",
-    });
+    // Make Valentin visible again and restore alpha
+    valentin.setVisible(true);
+    valentin.setAlpha(1);
+    
+    // Re-register with interaction detector
+    this.interactionDetector.registerInteractable(valentin);
+    console.log('[Incident] Valentin re-registered as interactable');
 
-    // Record incident in notebook
-    this.notebookManager.addEntry({
-      id: `incident-${Date.now()}`,
-      category: 'clue',
-      sourceId: 'incident',
-      sourceName: 'The Incident',
-      text: "Someone ate Valentin's erdbeerstrudel! The door is locked and no one can leave.",
-      timestamp: Date.now(),
-    });
+    // STEP 1: Position Valentin off-screen at the top (just above visible area)
+    const entryX = 600;
+    const entryY = -20; // Off-screen above
+    valentin.setPosition(entryX, entryY);
+    
+    // Enable physics body collision again
+    const body = valentin.body as Phaser.Physics.Arcade.Body;
+    if (body) {
+      body.setCollideWorldBounds(false); // Allow him to come from off-screen
+    }
 
-    // After cutscene duration, unlock movement
-    this.time.delayedCall(cutscene.durationMs, () => {
-      this.dialogBox.hide();
-      this.player.unlockMovement();
+    // STEP 2: Run to center of room
+    const centerX = 600;
+    const centerY = 400;
+    
+    console.log('[Incident] 🏃 Valentin running in from off-screen...');
+    valentin.walkToPosition(centerX, centerY, () => {
+      console.log('[Incident] 🎤 Valentin reached center, making announcement');
       
-      if (valentin && typeof valentin.resumeMovement === 'function') {
-        valentin.resumeMovement();
+      // Face south when speaking
+      if (typeof valentin.faceTowards === 'function') {
+        valentin.faceTowards(centerX, centerY + 100);
       }
       
-      // Visual indicator: lock the door (simplified - just log for now)
-      console.log('🚪 Door locked at', cutscene.doorPosition);
+      // STEP 3: Show speech dialog
+      this.dialogBox.show({
+        speaker: 'Valentin',
+        message: cutscene.speechLines.join('\n\n'),
+        type: 'npc',
+        characterId: 'valentin',
+        objectId: null,
+        recordInNotebook: true,
+        notebookNote: "Valentin's erdbeerstrudel has been eaten! He's locked the door!",
+      });
+
+      // Record incident in notebook
+      this.notebookManager.addEntry({
+        id: `incident-${Date.now()}`,
+        category: 'clue',
+        sourceId: 'incident',
+        sourceName: 'The Incident',
+        text: "Someone ate Valentin's erdbeerstrudel! The door is locked and no one can leave.",
+        timestamp: Date.now(),
+      });
+
+      // STEP 4: After speech, run to guard position at the door
+      this.time.delayedCall(cutscene.durationMs, () => {
+        this.dialogBox.hide();
+        
+        const doorX = cutscene.doorPosition.x;
+        const doorY = 100; // Top of scene (where door is)
+        
+        console.log('[Incident] 🏃 Valentin running to guard the door');
+        valentin.walkToPosition(doorX, doorY, () => {
+          console.log('[Incident] 🚪 Valentin now guarding the door');
+          
+          // Face south (looking at the room)
+          if (typeof valentin.faceTowards === 'function') {
+            valentin.faceTowards(doorX, doorY + 100);
+          }
+          
+          // Set this as his new home position with zero wander radius
+          if (typeof valentin.setHomePosition === 'function') {
+            valentin.setHomePosition(doorX, doorY);
+          }
+          
+          // Set wander radius to 0 so he won't move even if resumed
+          if ('wanderRadius' in valentin) {
+            (valentin as any).wanderRadius = 0;
+          }
+          
+          // Pause movement permanently - he's now a guard
+          if (typeof valentin.pauseMovement === 'function') {
+            valentin.pauseMovement();
+          }
+          
+          console.log('[Incident] Valentin locked in guard position (wanderRadius: 0, paused: true)');
+          
+          // Unlock player and resume other NPCs
+          this.player.unlockMovement();
+          this.npcs.forEach(npc => {
+            if (npc.id !== 'valentin' && typeof npc.resumeMovement === 'function') {
+              npc.resumeMovement();
+            }
+          });
+          
+          console.log('✅ Incident cutscene complete');
+        });
+      });
     });
 
-    console.log('🎬 Incident cutscene playing');
+    console.log('🎬 Incident cutscene starting');
   }
 
   /**

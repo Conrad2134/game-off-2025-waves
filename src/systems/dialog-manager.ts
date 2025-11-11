@@ -172,8 +172,16 @@ export class DialogManager {
     this.unlockPlayerMovement();
 
     // Resume NPC movement if applicable
+    // EXCEPT for Valentin in post-incident phase (he's guarding the door)
     if (this.activeEntity && typeof this.activeEntity.resumeMovement === 'function') {
-      this.activeEntity.resumeMovement();
+      const isValentinPostIncident = this.activeEntity.id === 'valentin' && 
+                                      this.progressionManager?.getCurrentPhase() === 'post-incident';
+      
+      if (!isValentinPostIncident) {
+        this.activeEntity.resumeMovement();
+      } else {
+        console.log('[DialogManager] Keeping Valentin paused - he\'s guarding the door');
+      }
     }
     
     this.activeEntity = null;
