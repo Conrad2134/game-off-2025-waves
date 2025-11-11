@@ -897,6 +897,14 @@ export class LibraryScene extends Phaser.Scene {
     // Find Valentin and move him to entry position
     const valentin = this.npcs.find(npc => npc.id === 'valentin');
     if (valentin) {
+      // Make Valentin visible again and restore alpha
+      valentin.setVisible(true);
+      valentin.setAlpha(1);
+      
+      // Re-register with interaction detector
+      this.interactionDetector.registerInteractable(valentin);
+      console.log('[Incident] Valentin re-registered as interactable');
+      
       valentin.setPosition(cutscene.entryPosition.x, cutscene.entryPosition.y);
       if (typeof valentin.pauseMovement === 'function') {
         valentin.pauseMovement();
@@ -1167,6 +1175,10 @@ export class LibraryScene extends Phaser.Scene {
         console.log('[Valentin] 🚀 Calling walkToPosition...');
         valentin.walkToPosition(targetX, targetY, () => {
           console.log('[Valentin] 🎯 Reached near-exit position, fading out...');
+          
+          // Unregister from interaction detector BEFORE fading out
+          this.interactionDetector.unregisterInteractable(valentin);
+          console.log('[Valentin] Unregistered from interaction detector');
           
           // Fade out and then hide
           this.tweens.add({
