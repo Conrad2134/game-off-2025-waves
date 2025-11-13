@@ -76,5 +76,15 @@
       "recordInNotebook": true,
       "notebookNote": "Emma admits she was tempted and approached the table, but claims it was already disturbed. Partial truth or full confession?"
     }
-  ]
+  ],
+  "postFailureVariant": {
+    "lines": [
+      "I heard you made a wrong accusation... That must have been difficult.",
+      "Valentin is quite upset, but don't give up. The truth is still here somewhere."
+    ],
+    "followUpLines": [
+      "Keep investigating. You'll find the real culprit.",
+      "Everyone makes mistakes. What matters is learning from them."
+    ]
+  }
 }

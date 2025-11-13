@@ -1,0 +1,257 @@
+{
+  "version": "1.0.0",
+  "config": {
+    "guiltyParty": "emma",
+    "minimumCluesRequired": 4,
+    "allowPartialEvidence": false,
+    "rejectionDialog": {
+      "speaker": "valentin",
+      "text": "No, no, NO! This is unacceptable! You have made too many mistakes. Your evidence is weak, your logic is flawed. I cannot accept this accusation. Please... investigate more thoroughly before you accuse someone again!"
+    }
+  },
+  "confrontations": {
+    "emma": {
+      "suspectId": "emma",
+      "motive": "She believed she could improve the recipe",
+      "confession": "I... I couldn't help myself! When I saw the erdbeerstrudel sitting there, I knew Valentin had potential, but his recipe... it needed refinement. I tasted it and realized I could make it perfect. So I... I took it to study the technique. I never meant to eat the whole thing!",
+      "statements": [
+        {
+          "id": "emma-alibi",
+          "text": "I was reading in the corner the whole time!",
+          "speaker": "suspect",
+          "requiredEvidence": "bookshelf-hiding-spot",
+          "acceptableEvidence": ["bookshelf-hiding-spot"],
+          "correctResponse": "But this hiding spot shows you could have slipped away unnoticed behind the bookshelf...",
+          "incorrectResponse": "That evidence doesn't contradict Emma's statement.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "emma-denial",
+          "text": "I never even went near Valentin's table!",
+          "speaker": "suspect",
+          "requiredEvidence": "desk-papers",
+          "acceptableEvidence": ["desk-papers", "strudel-crumbs"],
+          "correctResponse": "These papers show you had strong opinions about the recipe... and were close enough to take it!",
+          "incorrectResponse": "That doesn't prove Emma went to the table.",
+          "requiresPresentation": true,
+          "bonusEvidence": "strudel-crumbs",
+          "bonusResponse": "Not only do these papers prove your obsession, but these crumbs found near the table clinch it! You were definitely there!"
+        },
+        {
+          "id": "emma-motive",
+          "text": "Why would I ever take someone else's dessert?",
+          "speaker": "suspect",
+          "requiredEvidence": "desk-papers",
+          "acceptableEvidence": ["desk-papers"],
+          "correctResponse": "Because you wanted to 'improve' it! These notes prove your obsession with perfecting baked goods!",
+          "incorrectResponse": "That evidence doesn't establish a motive.",
+          "requiresPresentation": true,
+          "bonusEvidence": "suspicious-napkin",
+          "bonusResponse": "Your notes show the motive, and this napkin with strawberry stains shows you acted on it! You couldn't resist analyzing his technique!"
+        }
+      ]
+    },
+    "klaus": {
+      "suspectId": "klaus",
+      "motive": "He was hungry and couldn't resist",
+      "confession": "I... I was just so hungry! I had been reading for hours and skipped lunch. When I smelled that delicious erdbeerstrudel, I couldn't help myself. I'm so sorry, Valentin!",
+      "statements": [
+        {
+          "id": "klaus-timeline",
+          "text": "I was at my desk reading the entire afternoon. I never left my seat!",
+          "speaker": "suspect",
+          "requiredEvidence": "bookshelf-hiding-spot",
+          "acceptableEvidence": ["bookshelf-hiding-spot"],
+          "correctResponse": "But this hiding spot behind the bookshelf... you could have slipped away without being noticed!",
+          "incorrectResponse": "That doesn't prove Klaus left his desk.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "klaus-motive",
+          "text": "Why would I even want to eat someone else's dessert? I wasn't even hungry!",
+          "speaker": "suspect",
+          "requiredEvidence": "empty-plate",
+          "acceptableEvidence": ["empty-plate", "strudel-crumbs"],
+          "correctResponse": "Then explain this empty plate found near your area! Looks like someone was very hungry...",
+          "incorrectResponse": "That evidence doesn't establish Klaus's hunger as a motive.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "klaus-physical",
+          "text": "Even if I was hungry, you have no proof I took the strudel!",
+          "speaker": "suspect",
+          "requiredEvidence": "strudel-crumbs",
+          "acceptableEvidence": ["strudel-crumbs", "suspicious-napkin"],
+          "correctResponse": "These pastry crumbs tell a different story! Strawberry and vanilla... just like Valentin's erdbeerstrudel!",
+          "incorrectResponse": "That doesn't directly link Klaus to the missing strudel.",
+          "requiresPresentation": true
+        }
+      ]
+    },
+    "luca": {
+      "suspectId": "luca",
+      "motive": "He wanted to taste it out of curiosity",
+      "confession": "I admit it! I saw the erdbeerstrudel and my curiosity got the better of me. I just wanted one small taste to understand Valentin's technique... but it was so good I couldn't stop!",
+      "statements": [
+        {
+          "id": "luca-opportunity",
+          "text": "I was too busy organizing the shelves to notice any desserts!",
+          "speaker": "suspect",
+          "requiredEvidence": "bookshelf-hiding-spot",
+          "acceptableEvidence": ["bookshelf-hiding-spot"],
+          "correctResponse": "Organizing near this hidden gap? That gave you the perfect opportunity to slip away unnoticed!",
+          "incorrectResponse": "That doesn't connect Luca to the strudel.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "luca-motive",
+          "text": "I would never take someone's food without asking! That's completely against my nature!",
+          "speaker": "suspect",
+          "requiredEvidence": "suspicious-napkin",
+          "acceptableEvidence": ["suspicious-napkin", "strudel-crumbs"],
+          "correctResponse": "Then why was this napkin with strawberry jam traces found in your area? Your 'curiosity' got the better of you!",
+          "incorrectResponse": "That doesn't establish Luca's motive.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "luca-cleanup",
+          "text": "Even if I was curious, you have no proof I actually took it!",
+          "speaker": "suspect",
+          "requiredEvidence": "empty-plate",
+          "acceptableEvidence": ["empty-plate"],
+          "correctResponse": "This suspiciously clean plate tells another story. Someone carefully cleaned up... trying to hide the evidence!",
+          "incorrectResponse": "That evidence doesn't prove Luca took the strudel.",
+          "requiresPresentation": true
+        }
+      ]
+    },
+    "marianne": {
+      "suspectId": "marianne",
+      "motive": "She was jealous of Valentin's baking skills",
+      "confession": "Fine! I took it! Valentin is always showing off his baking skills, making everyone praise him. I wanted to see if it was really that good... and maybe make sure no one else got to taste his 'masterpiece'!",
+      "statements": [
+        {
+          "id": "marianne-jealousy",
+          "text": "I don't care about baking! It's a waste of time!",
+          "speaker": "suspect",
+          "requiredEvidence": "desk-papers",
+          "acceptableEvidence": ["desk-papers"],
+          "correctResponse": "These crossed-out recipe notes tell a different story... You care a lot about baking, enough to critique Valentin's work!",
+          "incorrectResponse": "That evidence doesn't connect to Marianne's feelings about baking.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "marianne-disinterest",
+          "text": "Even if I did care, I don't even like sweets! Why would I take a strudel?",
+          "speaker": "suspect",
+          "requiredEvidence": "strudel-crumbs",
+          "acceptableEvidence": ["strudel-crumbs", "suspicious-napkin"],
+          "correctResponse": "These strawberry-scented crumbs suggest otherwise! You couldn't resist seeing if his dessert was really that good!",
+          "incorrectResponse": "That doesn't prove Marianne likes sweets.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "marianne-opportunity",
+          "text": "You still can't prove I had the opportunity to take it!",
+          "speaker": "suspect",
+          "requiredEvidence": "bookshelf-hiding-spot",
+          "acceptableEvidence": ["bookshelf-hiding-spot"],
+          "correctResponse": "This hidden gap behind the bookshelf gave you the perfect cover to strike without being seen!",
+          "incorrectResponse": "That doesn't establish Marianne's opportunity.",
+          "requiresPresentation": true
+        }
+      ]
+    },
+    "sebastian": {
+      "suspectId": "sebastian",
+      "motive": "He thought it would be funny",
+      "confession": "Okay, okay! I took it! I thought it would be a hilarious prank. Valentin is always so serious about his baking. I was going to give it back... after I had a taste. But it was too delicious, and I ate the whole thing!",
+      "statements": [
+        {
+          "id": "sebastian-alibi",
+          "text": "I was far too busy with my studies to notice any desserts! Ask anyone!",
+          "speaker": "suspect",
+          "requiredEvidence": "empty-plate",
+          "acceptableEvidence": ["empty-plate", "strudel-crumbs"],
+          "correctResponse": "Your 'busy studies' left time for this empty plate though! Looks like someone took a snack break!",
+          "incorrectResponse": "That doesn't contradict Sebastian's statement about being busy.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "sebastian-character",
+          "text": "I would never pull a prank like that! I'm far too mature for such childish behavior!",
+          "speaker": "suspect",
+          "requiredEvidence": "suspicious-napkin",
+          "acceptableEvidence": ["suspicious-napkin"],
+          "correctResponse": "This carelessly discarded napkin suggests you weren't so careful after your 'prank'!",
+          "incorrectResponse": "That evidence doesn't establish Sebastian's character.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "sebastian-cleanup",
+          "text": "You have no proof connecting me to the actual theft!",
+          "speaker": "suspect",
+          "requiredEvidence": "strudel-crumbs",
+          "acceptableEvidence": ["strudel-crumbs"],
+          "correctResponse": "These pastry crumbs paint a clear picture! The strawberry scent is unmistakable - Valentin's erdbeerstrudel!",
+          "incorrectResponse": "That doesn't directly connect Sebastian to the theft.",
+          "requiresPresentation": true
+        }
+      ]
+    },
+    "valentin": {
+      "suspectId": "valentin",
+      "motive": "This makes no sense - he made the strudel!",
+      "confession": "Wait, why would I eat my own erdbeerstrudel that I was saving? This doesn't make any sense! Are you sure you've thought this through?",
+      "statements": [
+        {
+          "id": "valentin-logic",
+          "text": "But... I made that strudel to share with everyone! Why would I hide and eat my own creation?",
+          "speaker": "suspect",
+          "requiredEvidence": "strudel-crumbs",
+          "acceptableEvidence": ["strudel-crumbs", "empty-plate"],
+          "correctResponse": "Well... these crumbs... I suppose... Actually, this doesn't make much sense...",
+          "incorrectResponse": "That evidence doesn't support this accusation.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "valentin-confused",
+          "text": "I was the one who reported it missing! This accusation is completely illogical!",
+          "speaker": "suspect",
+          "requiredEvidence": "desk-papers",
+          "acceptableEvidence": ["desk-papers", "suspicious-napkin", "bookshelf-hiding-spot"],
+          "correctResponse": "Perhaps... wait, no. You're right. This doesn't add up at all.",
+          "incorrectResponse": "This accusation seems deeply flawed.",
+          "requiresPresentation": true
+        },
+        {
+          "id": "valentin-realization",
+          "text": "I think you need to reconsider your evidence. This makes absolutely no sense!",
+          "speaker": "suspect",
+          "requiredEvidence": "empty-plate",
+          "acceptableEvidence": ["empty-plate"],
+          "correctResponse": "You know what... you're absolutely right. I need to think this through more carefully.",
+          "incorrectResponse": "This line of reasoning is clearly incorrect.",
+          "requiresPresentation": true
+        }
+      ]
+    }
+  },
+  "endings": {
+    "victory": {
+      "valentinReaction": {
+        "emma": "Emma?! But you always gave such thoughtful feedback on my baking! I never thought your perfectionism would lead to... this.",
+        "klaus": "Klaus! I should have known you'd be eyeing my desserts. Your appetite is legendary!",
+        "luca": "Luca, your curiosity finally got the better of you! I suppose I should be flattered it was that irresistible.",
+        "marianne": "Marianne... I had no idea you felt that competitive about baking. We could have collaborated instead!",
+        "sebastian": "Sebastian! A prank? Really? Well, I suppose I can appreciate the humor... once I calm down.",
+        "valentin": "Wait, this doesn't make any sense. I think there's been a mistake in the investigation..."
+      },
+      "bonusAcknowledgment": "Impressive detective work! You found every clue in the library and solved the mystery with perfect evidence."
+    },
+    "badEnding": {
+      "despairSpeech": "I... I give up. After two false accusations, I can't trust anyone anymore. Everyone, you may leave. I'll just have to live with never knowing who ate my precious erdbeerstrudel...",
+      "failureExplanation": "You made too many incorrect accusations. Valentin has lost faith in your detective abilities, and the mystery remains unsolved. The culprit walks free, leaving Valentin heartbroken and dessertless."
+    }
+  }
+}

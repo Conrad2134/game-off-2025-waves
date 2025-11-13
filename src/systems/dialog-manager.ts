@@ -124,25 +124,94 @@ export class DialogManager {
     // Use phase-based selection for NPCs if progression manager available
     let messageData = dialogData;
     let effectiveTier = 0;
+    let dialogOptions: any[] | undefined;
+    
     if (sourceType === 'npc' && this.progressionManager) {
       const phase = this.progressionManager.getCurrentPhase();
-      const requestedTier = this.progressionManager.getDialogTier();
       
-      // Select dialog and get the actual tier used
-      const result = this.selectDialog(sourceId, phase, requestedTier);
-      messageData = result.data;
-      effectiveTier = result.effectiveTier;
+      // Check for failed accusations to show appropriate dialog variant
+      const accusationManager = this.scene.registry.get('accusationManager');
+      const failedAccusations = accusationManager?.getState()?.failedAccusations || 0;
       
-      // Check count BEFORE recording conversation
-      const countBefore = this.progressionManager.getConversationCount(sourceId, effectiveTier);
-      console.log(`[Dialog.open] ${sourceId} - Count BEFORE: ${countBefore}, Requested tier: ${requestedTier}, Effective tier: ${effectiveTier}`);
-      
-      this.currentNPCId = sourceId;
-      this.currentTier = effectiveTier; // Track the actual tier being shown
+      // For Valentin in post-incident phase, check if we should show accusation dialog
+      if (sourceId === 'valentin' && phase === 'post-incident') {
+        const validation = accusationManager?.canInitiateAccusation();
+        
+        // Show accusation initiation dialog if player has enough clues
+        if (validation?.canAccuse) {
+          const valentinData = this.dialogCache.get('valentin');
+          let accusationDialog: any;
+          
+          if (failedAccusations > 0 && (valentinData as any).accusationInitiation?.afterFirstFailure) {
+            accusationDialog = (valentinData as any).accusationInitiation.afterFirstFailure[0];
+          } else if ((valentinData as any).accusationInitiation?.default) {
+            accusationDialog = (valentinData as any).accusationInitiation.default[0];
+          }
+          
+          if (accusationDialog) {
+            messageData = {
+              lines: [accusationDialog.text],
+              recordInNotebook: false,
+            };
+            dialogOptions = accusationDialog.options;
+            this.currentNPCId = sourceId;
+            this.currentTier = 0;
+          }
+        } else if (!validation?.canAccuse && (this.dialogCache.get('valentin') as any)?.accusationInitiation?.insufficientEvidence) {
+          // Show insufficient evidence dialog
+          const valentinData = this.dialogCache.get('valentin');
+          const insufficientDialog = (valentinData as any).accusationInitiation.insufficientEvidence[0];
+          messageData = {
+            lines: [insufficientDialog.text],
+            recordInNotebook: false,
+          };
+          dialogOptions = insufficientDialog.options;
+          this.currentNPCId = sourceId;
+          this.currentTier = 0;
+        } else {
+          // Normal tier-based dialog selection
+          const requestedTier = this.progressionManager.getDialogTier();
+          
+          // Select dialog and get the actual tier used
+          const result = this.selectDialog(sourceId, phase, requestedTier);
+          messageData = result.data;
+          effectiveTier = result.effectiveTier;
+          
+          this.currentNPCId = sourceId;
+          this.currentTier = effectiveTier; // Track the actual tier being shown
+        }
+      } else {
+        // Normal tier-based dialog selection for other NPCs
+        const requestedTier = this.progressionManager.getDialogTier();
+        
+        // Select dialog and get the actual tier used
+        const result = this.selectDialog(sourceId, phase, requestedTier);
+        messageData = result.data;
+        effectiveTier = result.effectiveTier;
+        
+        this.currentNPCId = sourceId;
+        this.currentTier = effectiveTier; // Track the actual tier being shown
+      }
     }
 
     const message = this.createMessage(messageData, sourceType, sourceId, speakerName);
-    this.dialogBox.show(message);
+    
+    // Add options if present
+    if (dialogOptions) {
+      message.options = dialogOptions;
+    }
+    
+    // Pass entity reference for option handling callback
+    this.dialogBox.show(message, (action: string) => {
+      console.log(`[DialogManager] Option selected: ${action}`);
+      // Close dialog first so action can open new UI
+      this.close();
+      // Handle option selection after closing
+      if (entity && typeof entity.handleDialogAction === 'function') {
+        entity.handleDialogAction(action);
+      }
+    });
+    
     this.isDialogOpen = true; // Mark that THIS manager is controlling the dialog
     this.lockPlayerMovement();
     this.addToHistory(message);
@@ -237,6 +306,12 @@ export class DialogManager {
    */
   public handleInput(): void {
     if (this.isOpen()) {
+      // First check for number key input (option selection)
+      if (this.dialogBox.handleNumberKeyInput()) {
+        // Option was selected via keyboard
+        return;
+      }
+      
       // Check for interact keys (advance page or close)
       if (this.isInteractKeyPressed()) {
         // Try to advance to next page
@@ -383,6 +458,10 @@ export class DialogManager {
       console.warn(`No dialog data for character: ${characterId}`);
       return { data: this.fallbackDialog(), effectiveTier: 0 };
     }
+    
+    // Check for failed accusations to show post-failure variant
+    const accusationManager = this.scene.registry.get('accusationManager');
+    const failedAccusations = accusationManager?.getState()?.failedAccusations || 0;
 
     if (phase === 'pre-incident') {
       // Return introduction dialog
@@ -396,7 +475,35 @@ export class DialogManager {
         effectiveTier: 0,
       };
     } else {
-      // Post-incident: check if tier is available based on clues discovered
+      // Post-incident: check for post-failure variant first
+      if (failedAccusations > 0 && (charData as any).postFailureVariant) {
+        const postFailure = (charData as any).postFailureVariant;
+        const conversationCount = this.progressionManager?.getConversationCount(characterId, -1) ?? 0;
+        
+        console.log(`[Dialog] ${characterId} - Phase: ${phase}, Failed accusations: ${failedAccusations}, Using post-failure variant`);
+        
+        if (conversationCount === 0) {
+          return {
+            data: {
+              lines: postFailure.lines,
+              recordInNotebook: false,
+            },
+            effectiveTier: -1, // Special tier for post-failure
+          };
+        } else {
+          const index = (conversationCount - 1) % postFailure.followUpLines.length;
+          return {
+            data: {
+              lines: [postFailure.followUpLines[index]],
+              recordInNotebook: false,
+            },
+            effectiveTier: -1,
+          };
+        }
+      }
+      
+      // Normal tier-based selection
+      // check if tier is available based on clues discovered
       const availableTier = this.getAvailableTier(characterId);
       const effectiveTier = Math.min(tier, availableTier);
       

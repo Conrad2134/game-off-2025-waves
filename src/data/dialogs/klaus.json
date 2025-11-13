@@ -75,5 +75,15 @@
       "recordInNotebook": true,
       "notebookNote": "Klaus confesses to taking a piece out of professional jealousy to verify his critique. Admits it was perfect. Multiple people involved?"
     }
-  ]
+  ],
+  "postFailureVariant": {
+    "lines": [
+      "So... you accused the wrong person, ja? This is very serious business.",
+      "Valentin told me about your mistake. You must be more careful with accusations!"
+    ],
+    "followUpLines": [
+      "Think before you accuse someone. Evidence is everything.",
+      "Maybe you should review your clues more carefully."
+    ]
+  }
 }

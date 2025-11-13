@@ -79,5 +79,48 @@
       "recordInNotebook": true,
       "notebookNote": "Valentin suspects collective guilt. He wants confrontation and full confessions from everyone involved."
     }
-  ]
+  ],
+  "accusationInitiation": {
+    "default": [
+      {
+        "text": "Have you figured out who ate my erdbeerstrudel? Do you know who the culprit is?",
+        "options": [
+          {
+            "text": "I think I know who did it",
+            "action": "initiate-accusation"
+          },
+          {
+            "text": "Not yet, I need more evidence",
+            "action": "continue-investigation"
+          }
+        ]
+      }
+    ],
+    "afterFirstFailure": [
+      {
+        "text": "You... you already made one wrong accusation. Please, be more careful this time. I can't take much more of this...",
+        "options": [
+          {
+            "text": "I think I know who did it",
+            "action": "initiate-accusation"
+          },
+          {
+            "text": "Let me investigate more",
+            "action": "continue-investigation"
+          }
+        ]
+      }
+    ],
+    "insufficientEvidence": [
+      {
+        "text": "You don't have enough evidence yet! Please, find more clues before making an accusation. I need solid proof!",
+        "options": [
+          {
+            "text": "I'll keep investigating",
+            "action": "continue-investigation"
+          }
+        ]
+      }
+    ]
+  }
 }

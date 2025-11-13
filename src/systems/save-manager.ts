@@ -17,6 +17,7 @@ import type { PlayerCharacter } from '../entities/player-character';
 import type { NPCCharacter } from '../entities/npc-character';
 import type { GameProgressionManager } from './game-progression-manager';
 import type { NotebookManager } from './notebook-manager';
+import type { AccusationState } from '../types/accusation';
 
 export interface SaveManagerConfig {
   /** Parent Phaser scene */
@@ -119,6 +120,7 @@ export class SaveManager extends Phaser.Events.EventEmitter {
         hasPlayedOpeningScene: this.hasPlayedOpeningScene,
         hasPlayedIncident: this.progressionManager.getCurrentPhase() === 'post-incident',
         notebookEntries: this.notebookManager.getEntries(),
+        accusation: this.getAccusationState(),
       };
 
       localStorage.setItem(this.storageKey, JSON.stringify(saveData));
@@ -336,6 +338,93 @@ export class SaveManager extends Phaser.Events.EventEmitter {
     }
 
     return result;
+  }
+  /**
+   * Get accusation state for saving
+   */
+  private getAccusationState(): { failedAccusations: number; accusedSuspects: string[]; lastAccusationTimestamp?: number } {
+    // Get accusation manager from registry if available
+    const accusationManager = this.scene.registry.get('accusationManager');
+    if (accusationManager && typeof accusationManager.getState === 'function') {
+      const state = accusationManager.getState() as AccusationState;
+      return {
+        failedAccusations: state.failedAccusations,
+        accusedSuspects: state.accusedSuspects,
+        lastAccusationTimestamp: state.lastAccusationTimestamp,
+      };
+    }
+    
+    // Return default state if accusation manager not initialized
+    return {
+      failedAccusations: 0,
+      accusedSuspects: [],
+    };
+  }
+
+  /**
+   * Save accusation state to LocalStorage
+   * Called by AccusationManager when state changes
+   */
+  saveAccusationState(state: AccusationState): void {
+    try {
+      const json = localStorage.getItem(this.storageKey);
+      if (!json) {
+        console.warn('No existing save data to update accusation state');
+        return;
+      }
+
+      const saveData = JSON.parse(json) as GameSaveData;
+      saveData.accusation = {
+        failedAccusations: state.failedAccusations,
+        accusedSuspects: state.accusedSuspects,
+        lastAccusationTimestamp: state.lastAccusationTimestamp,
+      };
+      saveData.timestamp = Date.now();
+
+      localStorage.setItem(this.storageKey, JSON.stringify(saveData));
+      console.log('💾 Accusation state saved');
+    } catch (error) {
+      console.error('Failed to save accusation state:', error);
+    }
+  }
+
+  /**
+   * Load accusation state from save data
+   * Called by AccusationManager during initialization
+   */
+  loadAccusationState(): AccusationState {
+    try {
+      const json = localStorage.getItem(this.storageKey);
+      if (!json) {
+        return this.getDefaultAccusationState();
+      }
+
+      const saveData = JSON.parse(json) as GameSaveData;
+      if (saveData.accusation) {
+        return {
+          failedAccusations: saveData.accusation.failedAccusations,
+          currentConfrontation: null, // Never persist active confrontation
+          accusedSuspects: saveData.accusation.accusedSuspects,
+          lastAccusationTimestamp: saveData.accusation.lastAccusationTimestamp,
+        };
+      }
+
+      return this.getDefaultAccusationState();
+    } catch (error) {
+      console.error('Failed to load accusation state:', error);
+      return this.getDefaultAccusationState();
+    }
+  }
+
+  /**
+   * Get default accusation state
+   */
+  private getDefaultAccusationState(): AccusationState {
+    return {
+      failedAccusations: 0,
+      currentConfrontation: null,
+      accusedSuspects: [],
+    };
   }
 
   /**

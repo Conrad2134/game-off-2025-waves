@@ -76,5 +76,15 @@
       "recordInNotebook": true,
       "notebookNote": "Luca confesses to taking one piece out of curiosity, but claims multiple pieces were already missing. Collective crime?"
     }
-  ]
+  ],
+  "postFailureVariant": {
+    "lines": [
+      "I understand you made an incorrect accusation. That's... unfortunate.",
+      "Valentin is rather distressed. Perhaps more investigation is needed before another accusation."
+    ],
+    "followUpLines": [
+      "Take your time. Rushing leads to errors.",
+      "The evidence will reveal the truth if you look carefully."
+    ]
+  }
 }

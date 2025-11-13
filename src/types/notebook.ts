@@ -31,6 +31,9 @@ export interface NotebookEntry {
   
   /** Timestamp when this entry was recorded */
   timestamp: number;
+  
+  /** Clue ID (for clue entries, used in confrontation mode) */
+  clueId?: string;
 }
 
 /**

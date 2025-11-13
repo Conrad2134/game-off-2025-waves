@@ -10,6 +10,9 @@ import { NotebookUI } from '../components/notebook-ui';
 import { GameProgressionManager } from '../systems/game-progression-manager';
 import { ClueTracker } from '../systems/clue-tracker';
 import { SaveManager } from '../systems/save-manager';
+import { AccusationManager } from '../systems/accusation-manager';
+import { AccusationUI } from '../components/accusation-ui';
+import { EndingSequence } from '../components/ending-sequence';
 import type {
   LibraryLayoutConfig,
   FurnitureConfig,
@@ -57,6 +60,11 @@ export class LibraryScene extends Phaser.Scene {
   
   // Save system
   private saveManager!: SaveManager;
+  
+  // Accusation system
+  private accusationManager!: AccusationManager;
+  private accusationUI!: AccusationUI;
+  private endingSequence!: EndingSequence;
   
   // Opening scene
   private npcRoamingPositions: Map<string, { x: number; y: number }> = new Map();
@@ -193,6 +201,9 @@ export class LibraryScene extends Phaser.Scene {
     
     // Initialize save system AFTER all other systems are ready
     this.initializeSaveSystem();
+    
+    // Initialize accusation system AFTER all other systems
+    this.initializeAccusationSystem();
     
     // Link all systems together
     this.linkSystems();
@@ -758,6 +769,224 @@ export class LibraryScene extends Phaser.Scene {
     });
 
     console.log('✓ Notebook system initialized');
+  }
+  
+  /**
+   * Initialize accusation system (confrontations and endings)
+   */
+  private async initializeAccusationSystem(): Promise<void> {
+    // Create AccusationManager
+    this.accusationManager = new AccusationManager(this);
+    await this.accusationManager.initialize();
+    
+    // Forward AccusationManager events to scene events
+    this.accusationManager.on('accusation:suspect-selection-opened', () => {
+      this.events.emit('accusation:suspect-selection-opened');
+    });
+    this.accusationManager.on('accusation:started', (data: any) => {
+      this.events.emit('accusation:started', data);
+    });
+    this.accusationManager.on('accusation:evidence-presented', (data: any) => {
+      this.events.emit('accusation:evidence-presented', data);
+    });
+    this.accusationManager.on('accusation:statement-advanced', (data: any) => {
+      this.events.emit('accusation:statement-advanced', data);
+    });
+    this.accusationManager.on('accusation:success', (data: any) => {
+      this.events.emit('accusation:success', data);
+    });
+    this.accusationManager.on('accusation:victory-triggered', (data: any) => {
+      this.events.emit('accusation:victory-triggered', data);
+    });
+    this.accusationManager.on('accusation:failed', (data: any) => {
+      this.events.emit('accusation:failed', data);
+    });
+    this.accusationManager.on('accusation:bad-ending-triggered', () => {
+      this.events.emit('accusation:bad-ending-triggered');
+    });
+    this.accusationManager.on('accusation:cancelled', (data: any) => {
+      this.events.emit('accusation:cancelled', data);
+    });
+    
+    // Create AccusationUI
+    this.accusationUI = new AccusationUI(this);
+    this.accusationUI.initialize(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2
+    );
+    
+    // Create EndingSequence
+    this.endingSequence = new EndingSequence(this, this.dialogBox);
+    this.endingSequence.initialize();
+    
+    // Setup accusation event listeners
+    this.events.on('accusation:suspect-selection-opened', () => {
+      const suspects = this.accusationManager.getAvailableSuspects();
+      this.accusationUI.showSuspectSelection(suspects, false);
+    });
+    
+    // Handle suspect selection from UI
+    this.events.on('ui:suspect-selected', (data: { suspectId: string }) => {
+      console.log(`[LibraryScene] Suspect selected: ${data.suspectId}`);
+      
+      // Hide the accusation UI immediately
+      this.accusationUI.hide();
+      
+      // Check if correct suspect
+      const guiltyParty = this.accusationManager.getGuiltyParty();
+      
+      if (data.suspectId === guiltyParty) {
+        // Correct accusation - trigger victory
+        console.log('[LibraryScene] Correct accusation! Starting victory sequence...');
+        
+        // Get victory data
+        const accusationConfig = this.accusationManager['config'];
+        const confrontation = accusationConfig.confrontations[data.suspectId];
+        
+        const victoryData = {
+          culpritId: data.suspectId,
+          confession: confrontation.confession,
+          valentinReaction: accusationConfig.endings.victory.valentinReaction[data.suspectId],
+          summary: {
+            motive: confrontation.motive,
+            keyEvidence: [],
+            bonusAcknowledgment: undefined,
+          },
+        };
+        
+        this.endingSequence.playVictory(victoryData);
+      } else {
+        // Wrong accusation - increment failures
+        console.log('[LibraryScene] Wrong accusation!');
+        
+        this.accusationManager['state'].failedAccusations++;
+        
+        if (this.accusationManager['state'].failedAccusations >= 2) {
+          // Trigger bad ending
+          const badEndingData = this.accusationManager.getBadEndingData();
+          this.endingSequence.playBadEnding(badEndingData);
+        } else {
+          // Show rejection and continue
+          const dialogData = {
+            lines: [`No, that's not right! ${data.suspectId} didn't eat my erdbeerstrudel! Please investigate more carefully!`],
+            recordInNotebook: false,
+          };
+          
+          this.dialogManager.open(
+            dialogData,
+            'npc',
+            'valentin',
+            'Valentin',
+            this.npcs.find(npc => npc.id === 'valentin')
+          );
+        }
+      }
+    });
+    
+    this.events.on('accusation:started', (data: { suspectId: string; statement: any }) => {
+      this.accusationUI.startConfrontation(data.suspectId, data.statement);
+    });
+    
+    this.events.on('accusation:evidence-presented', () => {
+      const progress = this.accusationManager.getCurrentConfrontation();
+      if (progress) {
+        this.accusationUI.updateMistakeCounter(progress.mistakeCount);
+      }
+    });
+    
+    this.events.on('accusation:statement-advanced', (data: { statementIndex: number; statement: any }) => {
+      const progress = this.accusationManager.getCurrentConfrontation();
+      if (progress) {
+        this.accusationUI.advanceToNextStatement(data.statement, progress);
+      }
+    });
+    
+    this.events.on('accusation:success', (data: { suspectId: string }) => {
+      this.accusationManager.onConfrontationSuccess(data.suspectId);
+      // Victory trigger handled by onConfrontationSuccess's emit
+    });
+    
+    this.events.on('accusation:victory-triggered', (data: { culpritId: string; victoryData: any }) => {
+      this.endingSequence.playVictory(data.victoryData);
+    });
+    
+    this.events.on('accusation:failed', () => {
+      // Show rejection dialog when 3 mistakes reached
+      const rejectionDialog = this.accusationManager.getRejectionDialog();
+      this.accusationUI.showRejectionDialog(
+        rejectionDialog.speaker,
+        rejectionDialog.text,
+        () => {
+          // After dismissal, check if bad ending should trigger
+          const state = this.accusationManager.getState();
+          if (state.failedAccusations < 2) {
+            // Just a failed confrontation, return to investigation
+            this.accusationUI.hide();
+          }
+          // If failedAccusations >= 2, bad ending will be triggered by AccusationManager
+        }
+      );
+    });
+    
+    this.events.on('accusation:bad-ending-triggered', () => {
+      const badEndingData = this.accusationManager.getBadEndingData();
+      this.endingSequence.playBadEnding(badEndingData);
+    });
+    
+    this.events.on('accusation:cancelled', () => {
+      this.accusationUI.hide();
+    });
+    
+    // Handle UI cancellation (Escape key in accusation UI)
+    this.events.on('ui:accusation-cancelled', () => {
+      this.accusationManager.cancelAccusation();
+    });
+    
+    // Handle evidence selection opening (opens notebook in confrontation mode)
+    this.events.on('accusation:open-evidence-selection', (data: { discoveredClues: string[]; mode: string }) => {
+      console.log('[LibraryScene] Opening evidence selection with clues:', data.discoveredClues);
+      // Open notebook UI in evidence selection mode
+      this.notebookUI.enterConfrontationMode(data.discoveredClues, (clueId: string) => {
+        console.log('[LibraryScene] Evidence selected:', clueId);
+        // Present the selected evidence
+        const result = this.accusationManager.presentEvidence(clueId);
+        this.notebookUI.exitConfrontationMode();
+        this.notebookUI.hide();
+        
+        // Handle result
+        if (result.confrontationFailed) {
+          // Confrontation failed - rejection dialog will be shown via accusation:failed event
+          return;
+        }
+        
+        if (result.correct) {
+          // Advance to next statement or complete confrontation
+          if (this.accusationManager.advanceStatement()) {
+            // More statements to go
+          } else {
+            // Confrontation complete - success event will be emitted
+          }
+        } else {
+          // Show incorrect evidence penalty
+          const penaltyMessage = result.responseText || 'That evidence doesn\'t contradict the statement!';
+          this.accusationUI.showPenaltyDialog(result.mistakeCount, penaltyMessage);
+        }
+      });
+    });
+    
+    this.events.on('accusation:close-evidence-selection', () => {
+      this.notebookUI.exitConfrontationMode();
+      this.notebookUI.hide();
+    });
+    
+    this.events.on('ending:return-to-title', () => {
+      this.cameras.main.fadeOut(1000);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start('StartScene');
+      });
+    });
+    
+    console.log('✓ Accusation system initialized');
   }
   
   /**

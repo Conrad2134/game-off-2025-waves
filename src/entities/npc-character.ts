@@ -357,4 +357,46 @@ export class NPCCharacter extends Phaser.GameObjects.Container implements Intera
     if (degrees >= 247.5 && degrees < 292.5) return 'north';
     return 'north-east';
   }
+
+  /**
+   * Handle dialog actions (e.g., 'initiate-accusation')
+   * Called by dialog system when player selects an action option
+   */
+  public handleDialogAction(action: string): void {
+    console.log(`[${this.characterName}] Handling dialog action: ${action}`);
+    
+    if (action === 'initiate-accusation') {
+      // Get accusation manager from registry
+      const accusationManager = this.scene.registry.get('accusationManager');
+      
+      if (!accusationManager) {
+        console.error('AccusationManager not found in registry');
+        return;
+      }
+      
+      // Validate player can make accusation
+      const validation = accusationManager.canInitiateAccusation();
+      
+      if (!validation.canAccuse) {
+        // Show warning dialog through dialog system
+        console.log(`[${this.characterName}] Accusation blocked: ${validation.reason}`);
+        this.scene.events.emit('show-dialog-message', {
+          speaker: 'Valentin',
+          message: validation.reason || 'Not enough evidence yet!',
+          type: 'npc',
+        });
+        return;
+      }
+      
+      // Start suspect selection
+      console.log(`[${this.characterName}] Calling startSuspectSelection()...`);
+      accusationManager.startSuspectSelection();
+      console.log(`[${this.characterName}] startSuspectSelection() called - suspect selection should now be visible`);
+    } else if (action === 'continue-investigation') {
+      // Just close dialog and let player continue investigating
+      console.log(`[${this.characterName}] Player chose to continue investigating`);
+    } else {
+      console.warn(`[${this.characterName}] Unknown dialog action: ${action}`);
+    }
+  }
 }

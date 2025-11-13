@@ -75,5 +75,15 @@
       "recordInNotebook": true,
       "notebookNote": "Marianne confesses to taking a piece for professional analysis. Claims strudel was already half-eaten. Collective guilt confirmed?"
     }
-  ]
+  ],
+  "postFailureVariant": {
+    "lines": [
+      "Oh dear, I heard about the wrong accusation. How awful for everyone involved.",
+      "Poor Valentin is beside himself. Please be more certain before you accuse someone again."
+    ],
+    "followUpLines": [
+      "I'm sure you'll figure it out eventually, dear.",
+      "Don't be discouraged. Just be more thorough next time."
+    ]
+  }
 }

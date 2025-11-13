@@ -4,8 +4,8 @@ A 2D pixel art mystery game built with Phaser 3, TypeScript, and Vite.
 
 ## Project Status
 
-**Current Feature**: 003-dialog-system  
-**Branch**: `003-dialog-system`
+**Current Feature**: 005-accusation-system  
+**Branch**: `005-accusation-system`
 
 ### Completed
 - ✅ Complete Phaser 3 project setup with TypeScript
@@ -16,6 +16,8 @@ A 2D pixel art mystery game built with Phaser 3, TypeScript, and Vite.
 - ✅ Project structure following game framework
 - ✅ Library scene with player movement and NPCs
 - ✅ Complete dialog system with proximity-based interactions
+- ✅ Game progression system with phase management and clue unlocking
+- ✅ Accusation system with Phoenix Wright-style confrontations
 
 ## Quick Start
 
@@ -58,17 +60,35 @@ src/
 │   └── interactable-object.ts # Examinable objects
 ├── systems/                # Core game systems
 │   ├── dialog-manager.ts   # Dialog state management
-│   └── interaction-detector.ts # Proximity detection
+│   ├── interaction-detector.ts # Proximity detection
+│   ├── clue-tracker.ts     # Clue discovery and state
+│   ├── game-progression-manager.ts # Game phases
+│   ├── accusation-manager.ts # Accusation logic
+│   ├── notebook-manager.ts # Player notebook
+│   └── save-manager.ts     # Save/load persistence
 ├── components/             # UI components
 │   ├── dialog-box.ts       # Dialog UI display
-│   └── interaction-indicator.ts # Interaction visual cue
+│   ├── interaction-indicator.ts # Interaction visual cue
+│   ├── notebook-ui.ts      # Notebook display
+│   ├── accusation-ui.ts    # Accusation interface
+│   └── ending-sequence.ts  # Victory/failure endings
 ├── data/                   # JSON game content
 │   ├── assets.json
-│   └── library-layout.json
+│   ├── library-layout.json
+│   ├── clues.json          # Clue definitions
+│   ├── progression.json    # Phase configuration
+│   ├── accusation.json     # Confrontation sequences
+│   └── dialogs/            # NPC dialog files
 ├── types/                  # TypeScript definitions
 │   ├── scenes.ts
-│   └── dialog.ts           # Dialog system types
+│   ├── dialog.ts           # Dialog system types
+│   ├── clue.ts             # Clue types
+│   ├── progression.ts      # Progression types
+│   ├── accusation.ts       # Accusation types
+│   └── save.ts             # Save state types
 └── utils/                  # Helper utilities
+    ├── validation.ts
+    └── evidence-validator.ts # Evidence validation logic
 
 public/
 ├── assets/                 # Game assets
@@ -153,6 +173,68 @@ Future features will include:
 - Voice acting and sound effects
 - Multi-choice dialog options
 - Clue discovery through dialog
+
+### Accusation System Architecture
+
+The accusation system enables the player to accuse suspects and engage in Phoenix Wright-style evidence confrontations.
+
+**Core Components:**
+
+1. **AccusationManager** (`src/systems/accusation-manager.ts`)
+   - Manages accusation state and confrontation progress
+   - Validates evidence requirements and logical sequencing
+   - Tracks failed accusations (max 2 failures triggers bad ending)
+   - Emits events for UI coordination
+   - Configured via `src/data/accusation.json`
+
+2. **AccusationUI** (`src/components/accusation-ui.ts`)
+   - Displays suspect selection screen
+   - Shows confrontation statements and mistake counter
+   - Integrates with NotebookUI for evidence presentation
+   - Handles keyboard shortcuts (E: evidence, Space: continue, Escape: cancel)
+   - Pixel-perfect rendering with fade transitions
+
+3. **EvidenceValidator** (`src/utils/evidence-validator.ts`)
+   - Pure utility for validating evidence presentations
+   - Checks evidence correctness against statements
+   - Detects out-of-order evidence (Valentin guidance)
+   - Supports bonus evidence for thorough players
+   - Generates penalty messages with escalation
+
+4. **EndingSequence** (`src/components/ending-sequence.ts`)
+   - Displays victory sequence (confession → reaction → door unlock → summary)
+   - Shows bad ending sequence (despair → door unlock → failure screen)
+   - Handles return to title screen
+
+**Data Flow:**
+
+```
+Player → AccusationUI → AccusationManager → EvidenceValidator → AccusationManager
+                ↓                ↓                                       ↓
+           NotebookUI      State Persistence                     Event Emissions
+                                 ↓                                       ↓
+                           SaveManager                         EndingSequence/UI
+```
+
+**Key Features:**
+
+- **Minimum Clue Requirement**: Player must discover at least 4 clues before accusing
+- **Evidence Sequencing**: Evidence must be presented in logical order (timeline → motive → opportunity)
+- **Bonus Evidence**: Optional extra evidence for thorough investigators
+- **Mistake Limit**: 3 incorrect evidence presentations fail the confrontation
+- **Failed Accusation Tracking**: NPCs react to previous failures, bad ending after 2 failures
+- **State Persistence**: Accusation progress saved to LocalStorage
+- **Debug Logging**: Event tracking for all major state transitions
+
+**Integration Points:**
+
+- Triggered from Valentin's dialog options (via NPCCharacter)
+- Uses ClueTracker to validate discovered clues
+- Uses NotebookUI for evidence selection during confrontation
+- Uses DialogManager for warning messages
+- Uses SaveManager for state persistence
+
+For detailed implementation, see `specs/005-accusation-system/` specifications.
 
 ## License
 

@@ -76,5 +76,15 @@
       "recordInNotebook": true,
       "notebookNote": "Sebastian confesses to eating 40% of the strudel with methodical precision. Claims 30% was already gone with three cutting patterns. He's the most detailed culprit."
     }
-  ]
+  ],
+  "postFailureVariant": {
+    "lines": [
+      "Word travels fast in here. I heard about your failed accusation.",
+      "Valentin isn't happy about it. You better be absolutely sure before you try again."
+    ],
+    "followUpLines": [
+      "False accusations damage trust. Be careful.",
+      "The real culprit is still out there. Focus on the evidence."
+    ]
+  }
 }

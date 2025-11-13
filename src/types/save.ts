@@ -79,6 +79,16 @@ export interface GameSaveData {
   
   /** Notebook entries that have been added */
   notebookEntries: NotebookEntry[];
+  
+  /** Accusation system state */
+  accusation?: {
+    /** Number of failed accusations (0-2) */
+    failedAccusations: number;
+    /** IDs of suspects already accused */
+    accusedSuspects: string[];
+    /** Timestamp of last accusation */
+    lastAccusationTimestamp?: number;
+  };
 }
 
 /**

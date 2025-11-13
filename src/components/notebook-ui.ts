@@ -33,6 +33,12 @@ export class NotebookUI {
   private sections: NotebookSection[] = [];
   private scrollY: number = 0;
   private maxScroll: number = 0;
+  
+  // Confrontation mode
+  private confrontationMode: boolean = false;
+  private selectionCallback: ((clueId: string) => void) | null = null;
+  private selectableClues: string[] = [];
+  private selectedIndex: number = 0;
 
   constructor(config: NotebookUIConfig) {
     this.scene = config.scene;
@@ -237,6 +243,155 @@ export class NotebookUI {
    */
   public isVisible(): boolean {
     return this.visible;
+  }
+
+  /**
+   * Enter confrontation mode for evidence selection
+   * @param discoveredClueIds - Array of clue IDs player has discovered
+   * @param onSelect - Callback when player selects evidence
+   */
+  public enterConfrontationMode(discoveredClueIds: string[], onSelect: (clueId: string) => void): void {
+    this.confrontationMode = true;
+    this.selectionCallback = onSelect;
+    this.selectableClues = discoveredClueIds;
+    this.selectedIndex = 0;
+    
+    // Filter sections to show only discovered clues
+    const clueOnlySections = this.sections.filter(s => s.category === 'clue');
+    this.renderConfrontationContent(clueOnlySections);
+    
+    // Update close hint text
+    this.closeHintText.setText('Select evidence with Enter | Esc to cancel');
+    
+    this.show();
+    console.log(`NotebookUI: Confrontation mode activated with ${discoveredClueIds.length} clues`);
+  }
+
+  /**
+   * Exit confrontation mode and return to normal notebook view
+   */
+  public exitConfrontationMode(): void {
+    this.confrontationMode = false;
+    this.selectionCallback = null;
+    this.selectableClues = [];
+    this.selectedIndex = 0;
+    
+    // Restore normal content
+    this.renderContent();
+    
+    // Restore close hint text
+    this.closeHintText.setText('Press N to close');
+    
+    console.log('NotebookUI: Confrontation mode deactivated');
+  }
+
+  /**
+   * Check if notebook is in confrontation mode
+   */
+  public isInConfrontationMode(): boolean {
+    return this.confrontationMode;
+  }
+
+  /**
+   * Render content for confrontation mode (clues only, with selection)
+   */
+  private renderConfrontationContent(clueSections: NotebookSection[]): void {
+    if (clueSections.length === 0 || this.selectableClues.length === 0) {
+      this.contentText.setText('No clues discovered yet.');
+      this.maxScroll = 0;
+      return;
+    }
+
+    let content = '══ SELECT EVIDENCE TO PRESENT ══\n\n';
+    
+    // Build a flat list of clue entries with their IDs
+    const clueEntries: Array<{ id: string; text: string; source: string }> = [];
+    clueSections.forEach(section => {
+      section.entries.forEach(entry => {
+        if (entry.clueId && this.selectableClues.includes(entry.clueId)) {
+          clueEntries.push({
+            id: entry.clueId,
+            text: entry.text,
+            source: section.sourceName,
+          });
+        }
+      });
+    });
+
+    // Render selectable clues with selection indicator
+    clueEntries.forEach((clue, index) => {
+      const isSelected = index === this.selectedIndex;
+      const indicator = isSelected ? '→ ' : '  ';
+      const style = isSelected ? `[${clue.source}] ${clue.text}` : `${clue.source}: ${clue.text}`;
+      content += `${indicator}${style}\n\n`;
+    });
+
+    this.contentText.setText(content);
+    
+    // Calculate max scroll
+    const contentHeight = this.contentText.height;
+    const visibleHeight = this.height - 160;
+    this.maxScroll = Math.max(0, contentHeight - visibleHeight);
+  }
+
+  /**
+   * Move selection up in confrontation mode
+   */
+  public moveSelectionUp(): void {
+    if (!this.confrontationMode) return;
+    
+    this.selectedIndex = Math.max(0, this.selectedIndex - 1);
+    
+    // Re-render to update selection indicator
+    const clueSections = this.sections.filter(s => s.category === 'clue');
+    this.renderConfrontationContent(clueSections);
+  }
+
+  /**
+   * Move selection down in confrontation mode
+   */
+  public moveSelectionDown(): void {
+    if (!this.confrontationMode) return;
+    
+    const maxIndex = this.selectableClues.length - 1;
+    this.selectedIndex = Math.min(maxIndex, this.selectedIndex + 1);
+    
+    // Re-render to update selection indicator
+    const clueSections = this.sections.filter(s => s.category === 'clue');
+    this.renderConfrontationContent(clueSections);
+  }
+
+  /**
+   * Confirm selection in confrontation mode
+   */
+  public confirmSelection(): void {
+    if (!this.confrontationMode || !this.selectionCallback) return;
+    
+    if (this.selectedIndex >= 0 && this.selectedIndex < this.selectableClues.length) {
+      const selectedClueId = this.selectableClues[this.selectedIndex];
+      console.log(`NotebookUI: Evidence selected: ${selectedClueId}`);
+      
+      // Call the callback with selected clue ID
+      this.selectionCallback(selectedClueId);
+      
+      // Exit confrontation mode
+      this.exitConfrontationMode();
+      this.hide();
+    }
+  }
+
+  /**
+   * Cancel evidence selection in confrontation mode
+   */
+  public cancelSelection(): void {
+    if (!this.confrontationMode) return;
+    
+    console.log('NotebookUI: Evidence selection cancelled');
+    this.exitConfrontationMode();
+    this.hide();
+    
+    // Emit cancellation event
+    this.scene.events.emit('notebook:evidence-cancelled');
   }
 
   /**

@@ -46,6 +46,17 @@ export interface DialogBoxConfig {
 }
 
 /**
+ * Dialog option for player choice
+ */
+export interface DialogOption {
+  /** Display text for the option */
+  text: string;
+  
+  /** Action identifier to trigger when selected */
+  action: string;
+}
+
+/**
  * A single unit of dialog content
  */
 export interface DialogMessage {
@@ -69,6 +80,9 @@ export interface DialogMessage {
   
   /** Summarized note for the notebook (if recordInNotebook is true) */
   notebookNote?: string;
+  
+  /** Optional dialog choices for player interaction */
+  options?: DialogOption[];
 }
 
 /**
